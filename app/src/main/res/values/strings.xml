@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">ChutlundsMobileApp</string>
+    <string name="app_name">Chutlunds Mobile App</string>
+    <string name="app_ID">ca-app-pub-8226562131234590~3888390221</string>
+
+
+    ADMOB Real Ads ID :
+<!--    <string name="ad_Unit_ID">ca-app-pub-8226562131234590/8949145216</string>-->
+<!--    <string name="Rewarded_ADS_Unit_ID">ca-app-pub-8226562131234590/9097350841</string>-->
+
+    ADMOB Test Ads ID:
+        <string name="Rewarded_ADS_Unit_ID">ca-app-pub-3940256099942544/5354046379</string>
+        <string name="ad_Unit_ID">ca-app-pub-3940256099942544/6300978111</string>
+
+    Fcebook Ads ID:
+    <string name="Facebbok_BannerAdUnit_1">998670014223210_998670777556467</string>
+    <string name="Facebbok_InterstitialAdUnit">998670014223210_998671504223061</string>
+
+
+    <string name="facebook_app_id">[998670014223210]</string>
+
+
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>

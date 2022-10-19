@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -11,9 +12,12 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+
 
     buildTypes {
         release {
@@ -41,14 +45,14 @@ dependencies {
     //    Jsoup
 
 //    implementation 'org.jsoup:jsoup:1.13.1'
-//    implementation 'com.github.fornewid:neumorphism:0.3.0'
+    implementation 'com.github.fornewid:neumorphism:0.3.0'
 
 
     // Lottie Animation
-//    implementation "com.airbnb.android:lottie:5.0.3"
-//
+    implementation "com.airbnb.android:lottie:5.0.3"
+
 //    //In app Review
-//    implementation "com.google.android.play:core:1.10.3"
+    implementation "com.google.android.play:core:1.10.3"
 
 
     //Volley Library
@@ -58,6 +62,19 @@ dependencies {
     //Image Library
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
+//Ads
+
+    implementation 'com.google.android.gms:play-services-ads:21.3.0'
+    implementation 'com.facebook.android:audience-network-sdk:6.11.0'
+    implementation 'com.google.ads.mediation:facebook:6.11.0.0'
+    implementation 'com.google.android.ads:mediation-test-suite:3.0.0'
+
+
+    //Firebase
+    implementation 'com.google.firebase:firebase-database:20.1.0'
+    implementation 'com.google.firebase:firebase-messaging:23.1.0'
+    implementation 'com.google.firebase:firebase-auth:21.1.0'
+    implementation 'com.google.firebase:firebase-storage:20.1.0'
 
 
 }
