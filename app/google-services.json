@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "864687027282",
+    "project_id": "chutlundsmobileapp",
+    "storage_bucket": "chutlundsmobileapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864687027282:android:97d8c8a6d63411054a9b8b",
+        "android_client_info": {
+          "package_name": "com.bhola.chutlundsmobileapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864687027282-1d7gg2iesh0dd2o0a6svqrc8uc6ch0g7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzbS3eHj_DcsYFYOcNNNVNZLTQ1ORqcYg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864687027282-1d7gg2iesh0dd2o0a6svqrc8uc6ch0g7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

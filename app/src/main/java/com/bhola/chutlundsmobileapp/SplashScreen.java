@@ -154,9 +154,6 @@ public class SplashScreen extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: "+Sex_Story);
                 Log.d(TAG, "onDataChange: "+Sex_Story_Switch_Open);
 
-                if (SplashScreen.Ads_State.equals("active")) {
-                    showAds();
-                }
 
                 Handler handler2 = new Handler();
                 handler2.postDelayed(new Runnable() {
@@ -207,18 +204,7 @@ public class SplashScreen extends AppCompatActivity {
         }
     }
 
-    private void showAds() {
 
-        if (Ad_Network_Name.equals("admob")) {
-            ADS_ADMOB rewarded_ads = new ADS_ADMOB(mRewardedVideoAd, this, getString(R.string.Rewarded_ADS_Unit_ID));
-            rewarded_ads.RewardedVideoAds();
-
-        } else {
-
-            ADS_FACEBOOK.interstitialAd(this, facebook_IntertitialAds, getString(R.string.Facebbok_InterstitialAdUnit));
-
-        }
-    }
 
 
     @Override

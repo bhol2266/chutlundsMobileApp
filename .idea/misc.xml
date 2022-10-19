@@ -4,8 +4,18 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/bhola/AndroidStudioProjects/ChutlundsMobileApp/app/src/main/res/layout/activity_main.xml" value="0.2" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/drawable/background2.xml" value="0.1" />
         <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/font/bangers.xml" value="0.27589743589743587" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/about_us.xml" value="0.1" />
         <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/activity_adminpanel.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/activity_terms_conditions.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/custom_snackbar_view.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/delete.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/exit_dialog.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/navheader.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/navigation_menu_contacts.xml" value="0.1" />
+        <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/progressbar_dialog.xml" value="0.1" />
         <entry key="..\:/Users/bhola/AndroidStudioProjects/chutlundsMobileApp/app/src/main/res/layout/splash_screen.xml" value="0.1" />
       </map>
     </option>
