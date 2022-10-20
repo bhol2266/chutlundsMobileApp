@@ -25,6 +25,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,6 +39,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +48,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -55,17 +66,11 @@ public class SplashScreen extends AppCompatActivity {
     public static String Refer_App_url2 = "https://play.google.com/store/apps/developer?id=UK+DEVELOPERS";
     public static String Ads_State = "inactive";
     public static String DB_NAME = "MCB_Story";
-    public static String exit_Refer_appNavigation = "inactive";
-    public static String Sex_Story = "inactive";
-    public static String Sex_Story_Switch_Open = "inactive";
     public static String Notification_ImageURL = "https://hotdesipics.co/wp-content/uploads/2022/06/Hot-Bangla-Boudi-Ki-Big-Boobs-Nangi-Selfies-_002.jpg";
     DatabaseReference url_mref;
     public static int Login_Times = 0;
-    com.facebook.ads.InterstitialAd facebook_IntertitialAds;
-    RewardedInterstitialAd mRewardedVideoAd;
+    public static List<Object> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
 
-    public static int DB_VERSION = 1;
-    public static int DB_VERSION_INSIDE_TABLE = 4;
     Handler handlerr;
 
     @Override
@@ -77,7 +82,7 @@ public class SplashScreen extends AppCompatActivity {
         allUrl();
 //        readJSON();
         sharedPrefrences();
-
+        getAPI_DATA();
 
         topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
         bottomAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_animation);
@@ -96,7 +101,7 @@ public class SplashScreen extends AppCompatActivity {
             public void onAnimationEnd(Animator animation) {
                 LinearLayout progressbar = findViewById(R.id.progressbar);
                 progressbar.setVisibility(View.VISIBLE);
-                startActivity(new Intent(SplashScreen.this,MainActivity.class));
+//                startActivity(new Intent(SplashScreen.this,MainActivity.class));
             }
 
             @Override
@@ -116,7 +121,6 @@ public class SplashScreen extends AppCompatActivity {
         generateFCMToken();
 
     }
-
 
 
     private void allUrl() {
@@ -144,16 +148,9 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Refer_App_url2 = (String) snapshot.child("Refer_App_url2").getValue();
-                exit_Refer_appNavigation = (String) snapshot.child("switch_Exit_Nav").getValue();
-                Sex_Story = (String) snapshot.child("Sex_Story").getValue();
-                Sex_Story_Switch_Open = (String) snapshot.child("Sex_Story_Switch_Open").getValue();
                 Ads_State = (String) snapshot.child("Ads").getValue();
                 Ad_Network_Name = (String) snapshot.child("Ad_Network").getValue();
                 Notification_ImageURL = (String) snapshot.child("Notification_ImageURL").getValue();
-
-                Log.d(TAG, "onDataChange: "+Sex_Story);
-                Log.d(TAG, "onDataChange: "+Sex_Story_Switch_Open);
-
 
                 Handler handler2 = new Handler();
                 handler2.postDelayed(new Runnable() {
@@ -167,10 +164,6 @@ public class SplashScreen extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                if (Login_Times > 4) {
-                    Sex_Story = "active";
-                    Sex_Story_Switch_Open = "active";
-                }
 
             }
         });
@@ -193,8 +186,6 @@ public class SplashScreen extends AppCompatActivity {
     }
 
 
-
-
     private void generateFCMToken() {
 
         if (getIntent() != null && getIntent().hasExtra("KEY1")) {
@@ -204,18 +195,6 @@ public class SplashScreen extends AppCompatActivity {
         }
     }
 
-
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (facebook_IntertitialAds != null) {
-            facebook_IntertitialAds.destroy();
-
-        }
-    }
 
     private void generateNotification() {
 
@@ -230,7 +209,22 @@ public class SplashScreen extends AppCompatActivity {
                 });
     }
 
+    private void getAPI_DATA() {
+        Trending_collectonData = new ArrayList<>();
+        Upcoming_collectonData = new ArrayList<>();
+        Popular_collectonData = new ArrayList<>();
+        New_collectonData = new ArrayList<>();
 
+        String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
+        boolean api_loaded = API_CONFIG.HomepageVideoAPI(API_URL, SplashScreen.this);
+
+        if (api_loaded) {
+            Log.d(TAG, "Trending_collectonData: "+Trending_collectonData.size());
+            Log.d(TAG, "Upcoming_collectonData: "+Upcoming_collectonData.size());
+            Log.d(TAG, "Popular_collectonData: "+Popular_collectonData.size());
+            Log.d(TAG, "New_collectonData: "+New_collectonData.size());
+        }
+    }
 
 
     boolean isInternetAvailable(Context context) {

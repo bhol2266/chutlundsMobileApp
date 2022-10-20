@@ -12,6 +12,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -74,49 +75,18 @@ public class MainActivity extends AppCompatActivity {
 
     
         navigationDrawer();
+        Button fetchBtn =findViewById(R.id.fetchBtn);
+        fetchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAPI_DATA();
+            }
+        });
    }
 
     private void getAPI_DATA() {
-        try {
-            String API_URL = "https://www.chutlunds.live/api/spangbang/getvideos";
-            String url = "https://spankbang.com/s/boobs";
-            JSONObject jsonBody = new JSONObject();
-            jsonBody.put("url", url);
-            final String requestBody = jsonBody.toString();
-
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL,
-                    response -> {
-                        Toast.makeText(this, "DATA Fetched", Toast.LENGTH_SHORT).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray finalDataArray = jsonObject.getJSONArray(("finalDataArray"));
-                            dataText.setText((CharSequence) finalDataArray.getJSONObject(4).toString());
-                            String imageURL =finalDataArray.getJSONObject(4).getString("thumbnailArray");
-                            Picasso.with(MainActivity.this).load(imageURL).into(image);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    },
-                    error -> Toast.makeText(this, "", Toast.LENGTH_SHORT).show()) {
-                //Add parameters
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    //body data
-                    Map<String, String> params = new HashMap<>();
-                    params.put("url", "https://spankbang.com/s/desi/?o=trending");
-                    return params;
-                }
-            };
-
-
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
+//        API_CONFIG.HomepageVideoAPI(API_URL, MainActivity.this);
     }
 
 
@@ -162,17 +132,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (SplashScreen.exit_Refer_appNavigation.equals("active") && SplashScreen.Login_Times < 2 && SplashScreen.Refer_App_url2.length() > 10) {
-
-                    Intent j = new Intent(Intent.ACTION_VIEW);
-                    j.setData(Uri.parse(SplashScreen.Refer_App_url2));
-                    try {
-                        startActivity(j);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
                 finishAffinity();
                 finish();
                 System.exit(0);
@@ -275,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.menu_second_app:
 
-                        if (SplashScreen.Refer_App_url2.length() > 10 && SplashScreen.exit_Refer_appNavigation.equals("active")) {
+                        if (SplashScreen.Refer_App_url2.length() > 10) {
                             Intent j = new Intent(Intent.ACTION_VIEW);
                             j.setData(Uri.parse(SplashScreen.Refer_App_url2));
                             startActivity(j);

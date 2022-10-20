@@ -193,29 +193,8 @@ public class admin_panel extends AppCompatActivity {
 
             }
         });
-        switch_Sex_Story.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (SplashScreen.Sex_Story_Switch_Open.equals("active")) {
-                        mref.child("Sex_Story").setValue("active");
-                    }
-                } else {
-                    mref.child("Sex_Story").setValue("inactive");
-                }
-            }
-        });
 
 
-        STory_Switch_Active_BTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (STory_Switch_Active_BTN.getText().toString().trim().equals("Disabled")) {
-                    mref.child("Sex_Story_Switch_Open").setValue("active");
-                } else
-                    mref.child("Sex_Story_Switch_Open").setValue("inactive");
-            }
-        });
 
 
     }
