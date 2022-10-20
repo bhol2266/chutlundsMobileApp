@@ -71,9 +71,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-     
 
-    
+        Log.d(TAG, "Trending_collectonData: "+SplashScreen.Trending_collectonData.size());
+        Log.d(TAG, "Upcoming_collectonData: "+SplashScreen.Upcoming_collectonData.size());
+        Log.d(TAG, "Popular_collectonData: "+SplashScreen.Popular_collectonData.size());
+        Log.d(TAG, "New_collectonData: "+SplashScreen.New_collectonData.size());
+
         navigationDrawer();
         Button fetchBtn =findViewById(R.id.fetchBtn);
         fetchBtn.setOnClickListener(new View.OnClickListener() {

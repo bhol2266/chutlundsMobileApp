@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -51,6 +52,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -72,6 +75,8 @@ public class SplashScreen extends AppCompatActivity {
     public static List<Object> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
 
     Handler handlerr;
+    boolean API_LOAD_FINISHED = false;
+    boolean LOTTIE_ANIM_FINISHED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +87,6 @@ public class SplashScreen extends AppCompatActivity {
         allUrl();
 //        readJSON();
         sharedPrefrences();
-        getAPI_DATA();
 
         topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
         bottomAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_animation);
@@ -101,7 +105,11 @@ public class SplashScreen extends AppCompatActivity {
             public void onAnimationEnd(Animator animation) {
                 LinearLayout progressbar = findViewById(R.id.progressbar);
                 progressbar.setVisibility(View.VISIBLE);
-//                startActivity(new Intent(SplashScreen.this,MainActivity.class));
+                LOTTIE_ANIM_FINISHED = true;
+
+                if (API_LOAD_FINISHED) {
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                }
             }
 
             @Override
@@ -115,6 +123,10 @@ public class SplashScreen extends AppCompatActivity {
             }
         });
 
+        if (isInternetAvailable(SplashScreen.this)) {
+            String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
+            HomepageVideoAPI(API_URL, this);
+        }
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         generateNotification();
@@ -124,7 +136,7 @@ public class SplashScreen extends AppCompatActivity {
 
 
     private void allUrl() {
-        if (!isInternetAvailable(SplashScreen.this)) {
+        if (!isInternetAvailable(this)) {
 
             Handler handler2 = new Handler();
             handler2.postDelayed(new Runnable() {
@@ -199,31 +211,78 @@ public class SplashScreen extends AppCompatActivity {
     private void generateNotification() {
 
 
-        FirebaseMessaging.getInstance().subscribeToTopic("all")
-                .addOnCompleteListener(task -> {
+        FirebaseMessaging.getInstance().subscribeToTopic("all").addOnCompleteListener(task -> {
 
-                    if (!task.isSuccessful()) {
-                        String msg = "Failed";
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
+            if (!task.isSuccessful()) {
+                String msg = "Failed";
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void getAPI_DATA() {
+
+    public void HomepageVideoAPI(String API_URL, Context context) {
+
         Trending_collectonData = new ArrayList<>();
         Upcoming_collectonData = new ArrayList<>();
         Popular_collectonData = new ArrayList<>();
         New_collectonData = new ArrayList<>();
 
-        String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
-        boolean api_loaded = API_CONFIG.HomepageVideoAPI(API_URL, SplashScreen.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, API_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonArray = jsonObject.getJSONArray("finalDataArray");
+                            JSONArray jsonArray_Trending = jsonArray.getJSONArray(0);
+                            JSONArray jsonArray2_Upcoming = jsonArray.getJSONArray(1);
+                            JSONArray jsonArray3_Popular = jsonArray.getJSONArray(2);
+                            JSONArray jsonArray4_New = jsonArray.getJSONArray(3);
 
-        if (api_loaded) {
-            Log.d(TAG, "Trending_collectonData: "+Trending_collectonData.size());
-            Log.d(TAG, "Upcoming_collectonData: "+Upcoming_collectonData.size());
-            Log.d(TAG, "Popular_collectonData: "+Popular_collectonData.size());
-            Log.d(TAG, "New_collectonData: "+New_collectonData.size());
-        }
+                            for (int i = 0; i < jsonArray_Trending.length(); i++) {
+                                JSONObject obj = jsonArray_Trending.getJSONObject(i);
+                                VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
+                                Trending_collectonData.add(videoModel);
+                            }
+
+                            for (int i = 0; i < jsonArray2_Upcoming.length(); i++) {
+                                JSONObject obj = jsonArray2_Upcoming.getJSONObject(i);
+                                VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
+                                Upcoming_collectonData.add(videoModel);
+                            }
+
+                            for (int i = 0; i < jsonArray3_Popular.length(); i++) {
+                                JSONObject obj = jsonArray3_Popular.getJSONObject(i);
+                                VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
+                                Popular_collectonData.add(videoModel);
+                            }
+
+                            for (int i = 0; i < jsonArray4_New.length(); i++) {
+                                JSONObject obj = jsonArray4_New.getJSONObject(i);
+                                VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
+                                New_collectonData.add(videoModel);
+                            }
+
+                            API_LOAD_FINISHED = true;
+                            if (LOTTIE_ANIM_FINISHED) {
+                                startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "JSONException: " + e.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "onErrorResponse: " + error.getMessage());
+            }
+        });
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(stringRequest);
     }
 
 
