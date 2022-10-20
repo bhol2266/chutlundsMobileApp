@@ -21,8 +21,6 @@ import java.util.List;
 public class API_CONFIG {
 
     private static String TAG = "jsonArray";
-
-
     public static void HomepageVideoAPI(String API_URL, Context context) {
         SplashScreen.Trending_collectonData = new ArrayList<>();
         SplashScreen.Upcoming_collectonData = new ArrayList<>();
@@ -83,6 +81,8 @@ public class API_CONFIG {
 
 
     }
+
+
 }
 
 //    private void getAPI_DATA() {
