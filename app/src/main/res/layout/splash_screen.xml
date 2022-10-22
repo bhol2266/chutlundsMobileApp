@@ -14,12 +14,12 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="150dp"
         android:fontFamily="@font/dancing"
         android:text="Chutlunds.live"
-        android:textColor="#000000"
+        android:textColor="@color/light_black"
         android:textSize="45dp"
-        android:textStyle="bold" />
+       />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie"
@@ -39,7 +39,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginRight="15dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="80dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:visibility="gone">
@@ -49,13 +49,14 @@
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:indeterminateTint="#000000" />
+            android:indeterminateTint="@color/light_black" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/robotoslab_regular"
             android:text="Loading videos..."
+            android:textColor="@color/light_black"
             android:textSize="16dp" />
 
     </LinearLayout>

@@ -6,7 +6,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.Dialog;
@@ -14,15 +20,21 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,12 +65,13 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.sql.Time;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import soup.neumorphism.NeumorphButton;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG ="TAGA" ;
+    private static final String TAG = "TAGA";
     TextView dataText;
     ImageView image;
     NavigationView nav;
@@ -72,26 +85,105 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d(TAG, "Trending_collectonData: "+SplashScreen.Trending_collectonData.size());
-        Log.d(TAG, "Upcoming_collectonData: "+SplashScreen.Upcoming_collectonData.size());
-        Log.d(TAG, "Popular_collectonData: "+SplashScreen.Popular_collectonData.size());
-        Log.d(TAG, "New_collectonData: "+SplashScreen.New_collectonData.size());
-
         navigationDrawer();
-        Button fetchBtn =findViewById(R.id.fetchBtn);
-        fetchBtn.setOnClickListener(new View.OnClickListener() {
+
+        trendingVideos();
+        upcomingVideos();
+        popularVideos();
+        newVideos();
+
+    }
+
+    private void trendingVideos() {
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+//        LinearLayoutManager layoutManager = new GridLayoutManager(this, 1);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView_Trending);
+
+        recyclerView.setLayoutManager(layoutManager);
+        Adapter adapter = new Adapter(MainActivity.this, SplashScreen.Trending_collectonData);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+
+        TextView trendingVideos = findViewById(R.id.trendingVideos);
+        trendingVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getAPI_DATA();
+                Intent intent = new Intent(v.getContext(), VideosList.class);
+                intent.putExtra("Title", "Trending Videos");
+                startActivity(intent);
             }
         });
-   }
+
+
+    }
+
+    private void upcomingVideos() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView_Upcoming);
+
+        recyclerView.setLayoutManager(layoutManager);
+        Adapter adapter = new Adapter(MainActivity.this, SplashScreen.Upcoming_collectonData);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        TextView trendingVideos = findViewById(R.id.upcomingVideos);
+        trendingVideos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), VideosList.class);
+                intent.putExtra("Title", "Upcoming Videos");
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void popularVideos() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView_Popular);
+
+        recyclerView.setLayoutManager(layoutManager);
+        Adapter adapter = new Adapter(MainActivity.this, SplashScreen.Popular_collectonData);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        TextView trendingVideos = findViewById(R.id.popularVideos);
+        trendingVideos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), VideosList.class);
+                intent.putExtra("Title", "Popular Videos");
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void newVideos() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView_New);
+
+        recyclerView.setLayoutManager(layoutManager);
+        Adapter adapter = new Adapter(MainActivity.this, SplashScreen.New_collectonData);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        TextView trendingVideos = findViewById(R.id.newVideos);
+        trendingVideos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), VideosList.class);
+                intent.putExtra("Title", "New Videos");
+                startActivity(intent);
+            }
+        });
+    }
+
 
     private void getAPI_DATA() {
 //        String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
 //        API_CONFIG.HomepageVideoAPI(API_URL, MainActivity.this);
     }
-
 
 
     @Override
@@ -106,9 +198,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void exit_dialog() {
-
 
 
         NeumorphButton exit, exit2;
@@ -118,15 +208,13 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(promptView);
         builder.setCancelable(true);
 
-        if (!(SplashScreen.Login_Times < 4)){
+        if (!(SplashScreen.Login_Times < 4)) {
             TextView exitMSG;
-            exitMSG =promptView.findViewById(R.id.exitMSG);
+            exitMSG = promptView.findViewById(R.id.exitMSG);
             exitMSG.setVisibility(View.VISIBLE);
             init(); // Show PLay store Review option
         }
 
-
-    
 
         exit = promptView.findViewById(R.id.exit_button2);
         exit2 = promptView.findViewById(R.id.exit_button1);
@@ -172,8 +260,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
                 switch (menuItem.getItemId()) {
-                  
-                  
+
 
                     case R.id.menu_contacts:
                         TextView whatsapp, email;
@@ -310,6 +397,90 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
+
+
+class Adapter extends RecyclerView.Adapter<Adapter.viewholder> {
+
+    Context context;
+    List<VideoModel> videoData;
+
+
+    public Adapter(Context context, List<VideoModel> videoData) {
+        this.context = context;
+        this.videoData = videoData;
+    }
+
+    @NonNull
+    @Override
+    public viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+
+        View view = layoutInflater.inflate(R.layout.video_thumnail, parent, false);
+        return new viewholder(view);
+    }
+
+    @Override
+    public void onViewRecycled(viewholder holder) {
+        super.onViewRecycled(holder);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull viewholder holder, int position) {
+        VideoModel item = videoData.get(position);
+
+        Picasso.with(context).load(item.getThumbnail()).into(holder.thumbnail);
+        holder.title.setText(item.getTitle());
+        holder.duration.setText(item.getDuration());
+        holder.views.setText(item.getViews());
+        holder.likes.setText(item.getLikedPercent());
+
+        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), VideoPlayer.class);
+                intent.putExtra("title", item.getTitle());
+                intent.putExtra("href", item.getHref());
+                v.getContext().startActivity(intent);
+
+            }
+        });
+
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return videoData.size();
+    }
+
+
+    public class viewholder extends RecyclerView.ViewHolder {
+        ImageView thumbnail;
+        TextView title;
+        TextView duration;
+        TextView views;
+        TextView likes;
+
+
+        public viewholder(@NonNull View itemView) {
+            super(itemView);
+
+            thumbnail = itemView.findViewById(R.id.thumbnailImage);
+            title = itemView.findViewById(R.id.video_title);
+            duration = itemView.findViewById(R.id.duration);
+            views = itemView.findViewById(R.id.views);
+            likes = itemView.findViewById(R.id.likes);
+
+
+        }
+
+
+    }
+}
+
+
 
 

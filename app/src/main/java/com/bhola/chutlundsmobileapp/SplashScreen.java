@@ -2,6 +2,7 @@ package com.bhola.chutlundsmobileapp;
 
 
 import android.animation.Animator;
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -24,6 +26,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.android.volley.AuthFailureError;
@@ -72,7 +77,7 @@ public class SplashScreen extends AppCompatActivity {
     public static String Notification_ImageURL = "https://hotdesipics.co/wp-content/uploads/2022/06/Hot-Bangla-Boudi-Ki-Big-Boobs-Nangi-Selfies-_002.jpg";
     DatabaseReference url_mref;
     public static int Login_Times = 0;
-    public static List<Object> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
+    public static List<VideoModel> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
 
     Handler handlerr;
     boolean API_LOAD_FINISHED = false;
@@ -81,6 +86,7 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fullscreenMode();
         setContentView(R.layout.splash_screen);
 
 
@@ -128,11 +134,12 @@ public class SplashScreen extends AppCompatActivity {
             HomepageVideoAPI(API_URL, this);
         }
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         generateNotification();
         generateFCMToken();
 
     }
+
 
 
     private void allUrl() {
@@ -322,5 +329,16 @@ public class SplashScreen extends AppCompatActivity {
         Log.i("update_statut", "Network is available : FALSE ");
         return false;
     }
+
+
+    private void fullscreenMode() {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
+        windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
+    }
+
 
 }
