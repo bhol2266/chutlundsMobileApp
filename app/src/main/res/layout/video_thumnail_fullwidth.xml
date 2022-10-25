@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="220dp"
             android:adjustViewBounds="true"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/ic_launcher_background" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_marginLeft="7dp"
             android:maxLines="1"
             android:text="This is title"
-            android:textSize="18dp" />
+            android:textSize="15dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:text="150000"
+                    android:text=""
                      style="@style/ThumbnailText" />
 
 
@@ -79,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:text="150000"
+                    android:text=""
                      style="@style/ThumbnailText" />
 
 
@@ -103,7 +103,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:text="150000"
+                    android:text=""
                      style="@style/ThumbnailText" />
 
 

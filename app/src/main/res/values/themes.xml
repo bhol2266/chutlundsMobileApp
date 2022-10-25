@@ -51,11 +51,25 @@
 
 
     <style name="tabText">
-
         <item name="android:textSize">20dp</item><!-- text size in menu-->
         <item name="android:fontFamily">@font/robotoslab_regular</item><!-- text size in menu-->
         <item name="android:background">@drawable/hooverffext</item><!-- text size in menu-->
-
     </style>
+
+
+
+    //Exoplayer
+
+    <style name="ExoMediaButton.Previous">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="ExoMediaButton.Next">
+        <item name="android:visibility">gone</item>
+    </style>
+
+
+
+
 
 </resources>

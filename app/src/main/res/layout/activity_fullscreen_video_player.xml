@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".FullscreenVideoPLayer">
+
+
+    <LinearLayout
+        android:id="@+id/linearLayoutStatusbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:elevation="10dp"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/relativelayoutt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+           >
+
+                <ImageView
+                    android:id="@+id/back_arrow"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="backButton"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/back_arrow" />
+
+                <TextView
+                    android:id="@+id/title_collection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginTop="0dp"
+                    android:longClickable="true"
+                    android:text="VideoPlayer"
+                    android:textSize="25sp" />
+
+                <!--            <ImageView-->
+                <!--                android:id="@+id/play_audio"-->
+                <!--                android:layout_width="40dp"-->
+                <!--                android:layout_height="40dp"-->
+                <!--                android:layout_alignParentEnd="true"-->
+                <!--                android:layout_alignParentRight="true"-->
+                <!--                android:layout_centerVertical="true"-->
+                <!--                android:layout_margin="10dp"-->
+                <!--                android:backgroundTint="#FFC107"-->
+                <!--                app:srcCompat="@drawable/audio" />-->
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:id="@+id/exoplayerFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        app:layout_constraintDimensionRatio="H,16:9">
+
+        <ImageView
+            android:id="@+id/thumbnailImageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="#000000" />
+
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/exolayerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:resize_mode="fit"
+            app:show_buffering="when_playing"
+            app:show_shuffle_button="true" />
+
+
+        <ProgressBar
+            android:id="@+id/videoProgressBar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="#ffffff" />
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:id="@+id/recyclerViewLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!--    VideoTitle textview-->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="sdafsadfsdafsadfsadfsadfads"
+            android:textSize="18dp" />
+
+        <LinearLayout
+
+            android:id="@+id/videoDetailBar"
+            android:layout_width="match_parent"
+            android:layout_height="27dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:srcCompat="@drawable/clock" />
+
+                <TextView
+                    android:id="@+id/duration"
+                    style="@style/ThumbnailText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="150000" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
+                    app:srcCompat="@drawable/eye" />
+
+                <TextView
+                    android:id="@+id/views"
+                    style="@style/ThumbnailText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="150000" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    app:srcCompat="@drawable/heart" />
+
+                <TextView
+                    android:id="@+id/likes"
+                    style="@style/ThumbnailText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="150000" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:id="@+id/relatedVideos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="Related Videos"
+            android:textColor="@color/primaryDark"
+            android:textSize="18dp"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

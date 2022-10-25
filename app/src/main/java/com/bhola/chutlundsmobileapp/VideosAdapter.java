@@ -1,6 +1,7 @@
 package com.bhola.chutlundsmobileapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,18 @@ class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.viewholder> {
         holder.views.setText(item.getViews());
         holder.likes.setText(item.getLikedPercent());
 
+        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), FullscreenVideoPLayer.class);
+                intent.putExtra("title", item.getTitle());
+                intent.putExtra("href", item.getHref());
+                intent.putExtra("thumbnail", item.getThumbnail());
+                v.getContext().startActivity(intent);
+
+            }
+        });
+
     }
 
 
@@ -78,24 +91,6 @@ class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.viewholder> {
             views = itemView.findViewById(R.id.views);
             likes = itemView.findViewById(R.id.likes);
 
-//            thumbnail.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent intent = new Intent(v.getContext(), LargeImageview.class);
-//                    intent.putExtra("DB_Table", "OfflineImagesURL");
-//                    intent.putExtra("position", getAdapterPosition());
-//                    intent.putExtra("ComingFromWhichCategory", offline);
-//                    if (screen.equals("Offline")) {
-//                        intent.putExtra("avtivity_for_backpress", "Offline");
-//                    } else {
-//                        intent.putExtra("avtivity_for_backpress", "Dashboard");
-//                    }
-//
-//
-//                    v.getContext().startActivity(intent);
-//
-//                }
-//            });
         }
 
 

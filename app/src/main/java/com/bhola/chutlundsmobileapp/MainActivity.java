@@ -440,9 +440,10 @@ class Adapter extends RecyclerView.Adapter<Adapter.viewholder> {
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), VideoPlayer.class);
+                Intent intent = new Intent(v.getContext(), FullscreenVideoPLayer.class);
                 intent.putExtra("title", item.getTitle());
                 intent.putExtra("href", item.getHref());
+                intent.putExtra("thumbnail", item.getThumbnail());
                 v.getContext().startActivity(intent);
 
             }
