@@ -72,6 +72,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     public static List<ScreenShotModel> screenshotsMap;
     public static List<VideoModel> relatedVideos;
     boolean fullscreenActive;
+    float videoAspectRatio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
         vidoetitle = getIntent().getStringExtra("title");
         href = getIntent().getStringExtra("href");
-        thumbnail  = getIntent().getStringExtra("thumbnail");
+        thumbnail = getIntent().getStringExtra("thumbnail");
         thumbnailImageView = findViewById(R.id.thumbnailImageView);
         Picasso.with(FullscreenVideoPLayer.this).load(thumbnail).into(thumbnailImageView);
 
@@ -103,9 +104,9 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     private void prepare_videoPlayer() {
 
         //This is because the videoDetailBar and relativelayout were not hiding inside recyclerViewLinearLayout, so hiding them indivisually
-        LinearLayout videoDetailBar =findViewById(R.id.videoDetailBar);
+        LinearLayout videoDetailBar = findViewById(R.id.videoDetailBar);
         videoDetailBar.setVisibility(View.VISIBLE);
-        TextView relativelayout =findViewById(R.id.relatedVideos);
+        TextView relativelayout = findViewById(R.id.relatedVideos);
         relativelayout.setVisibility(View.VISIBLE);
 
         recyclerViewLinearLayout.setVisibility(View.VISIBLE);
@@ -131,7 +132,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         playerView.setFullscreenButtonClickListener(new StyledPlayerView.FullscreenButtonClickListener() {
             @Override
             public void onFullscreenButtonClick(boolean isFullScreen) {
-
+                Log.d(TAG, "isFullScreen: " + isFullScreen);
                 if (!isFullScreen) {
                     fullscreenActive = false;
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
@@ -140,9 +141,20 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                     windowInsetsCompat.show(WindowInsetsCompat.Type.statusBars());
                     setVideoPlayerHeight_PORTRAIT("landscape");
                 } else {
+
+                    if (videoAspectRatio < 1) {
+
+                    } else {
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    }
                     fullscreenActive = true;
-                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    getWindow().getDecorView().setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
                     WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
                     windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
                     setVideoPlayerHeight_LANDSCAPE();
@@ -155,9 +167,10 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         playerView.setAspectRatioListener(new AspectRatioFrameLayout.AspectRatioListener() {
             @Override
             public void onAspectRatioUpdated(float targetAspectRatio, float naturalAspectRatio, boolean aspectRatioMismatch) {
-                Log.d(TAG, "targetAspectRatio: " + targetAspectRatio);
-                Log.d(TAG, "naturalAspectRatio: " + naturalAspectRatio);
-                Log.d(TAG, "aspectRatioMismatch: " + aspectRatioMismatch);
+//                Log.d(TAG, "targetAspectRatio: " + targetAspectRatio);
+//                Log.d(TAG, "naturalAspectRatio: " + naturalAspectRatio);
+//                Log.d(TAG, "aspectRatioMismatch: " + aspectRatioMismatch);
+                videoAspectRatio = targetAspectRatio;
             }
         });
 
@@ -267,9 +280,10 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         int displayWidth = displayMetrics.widthPixels;
         int displayHeight = displayMetrics.heightPixels;
         ViewGroup.LayoutParams params = exoplayerFrameLayout.getLayoutParams();
-        if (orientation == "landscape") {
+        if (orientation == "landscape" && videoAspectRatio > 1) {
             params.width = MATCH_PARENT;
             params.height = (displayHeight / 16) * 9;
+
         } else {
             params.width = MATCH_PARENT;
             params.height = (displayWidth / 16) * 9;
@@ -415,7 +429,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
             WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
             windowInsetsCompat.show(WindowInsetsCompat.Type.statusBars());
             setVideoPlayerHeight_PORTRAIT("landscape");
-        }else{
+        } else {
             super.onBackPressed();
 
         }
