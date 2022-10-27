@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
     tools:context=".FullscreenVideoPLayer">
 
 
@@ -92,6 +93,11 @@
             android:layout_height="match_parent"
             android:visibility="gone"
             app:resize_mode="fit"
+            app:played_color="@color/themeColor"
+            app:unplayed_color="#48FFFFFF"
+            app:scrubber_color="@color/themeColor"
+            app:player_layout_id="@layout/custom_player_view"
+            app:controller_layout_id="@layout/custom_control_view"
             app:show_buffering="when_playing"
             app:show_shuffle_button="true" />
 

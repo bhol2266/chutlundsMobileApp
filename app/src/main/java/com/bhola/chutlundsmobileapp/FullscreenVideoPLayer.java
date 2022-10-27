@@ -2,6 +2,7 @@ package com.bhola.chutlundsmobileapp;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -16,14 +17,18 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +59,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import soup.neumorphism.NeumorphButton;
+
 public class FullscreenVideoPLayer extends AppCompatActivity {
     TextView videoTitle;
     LinearLayout linearLayoutStatusbar;
@@ -65,6 +72,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     private String TAG = "jsonObject";
     ExoPlayer exoplayer;
     StyledPlayerView playerView;
+    TextView videoQualityTextview;
     String VideoSrc, vidoetitle, href;
     public static String Title, duration, likedPercent, thumbnail, views, preloaded_video_quality;
     public static List<String> video_qualities_available;
@@ -73,6 +81,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     public static List<VideoModel> relatedVideos;
     boolean fullscreenActive;
     float videoAspectRatio;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,8 +134,52 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         playerView.setShowNextButton(false);
         playerView.setShowShuffleButton(false);
         playerView.getControllerHideOnTouch();
+        playerView.setControllerShowTimeoutMs(3000);
         playerView.setControllerAutoShow(true);
         playerView.setKeepScreenOn(true);
+
+//        videoQualityTextview=playerView.findViewById(R.id.videoQualityTextview);
+//        videoQualityTextview.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                videoQuality_dialog();
+//            }
+//        });
+
+        Spinner spinner = findViewById(R.id.spinner1);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner, video_qualities_available);
+        adapter.setDropDownViewResource(R.layout.spinneritem);
+        spinner.setAdapter(adapter);
+        int spinnerPosition = video_qualities_available.indexOf(preloaded_video_quality);
+        spinner.setSelection(spinnerPosition);
+
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                int current_position = (int) exoplayer.getCurrentPosition();
+                if (current_position != 0  || video_qualities_available.indexOf(preloaded_video_quality) != position ) {
+                    exoplayer.stop();
+                    playerView.hideController();
+                    MediaItem mediaItem = MediaItem.fromUri(video_qualities_available_withURL.get(position));
+                    exoplayer.setMediaItem(mediaItem);
+                    exoplayer.prepare();
+                    exoplayer.play();
+                    exoplayer.seekTo(current_position);
+                    playerView.setVisibility(View.GONE);
+                    videoProgressBar.setVisibility(View.VISIBLE);
+                    thumbnailImageView.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
         playerView.setFullscreenButtonClickListener(new StyledPlayerView.FullscreenButtonClickListener() {
@@ -167,9 +220,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         playerView.setAspectRatioListener(new AspectRatioFrameLayout.AspectRatioListener() {
             @Override
             public void onAspectRatioUpdated(float targetAspectRatio, float naturalAspectRatio, boolean aspectRatioMismatch) {
-//                Log.d(TAG, "targetAspectRatio: " + targetAspectRatio);
-//                Log.d(TAG, "naturalAspectRatio: " + naturalAspectRatio);
-//                Log.d(TAG, "aspectRatioMismatch: " + aspectRatioMismatch);
+
                 videoAspectRatio = targetAspectRatio;
             }
         });
@@ -368,24 +419,20 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     }
 
 
-    private void fullscreenMode() {
+    private void videoQuality_dialog() {
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
-        windowInsetsCompat.hide(WindowInsetsCompat.Type.statusBars());
-        windowInsetsCompat.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(FullscreenVideoPLayer.this);
+        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+        View promptView = inflater.inflate(R.layout.video_qualityselector_dialog, null);
+        builder.setView(promptView);
+        builder.setCancelable(true);
+
+        dialog = builder.create();
+        dialog.show();
 
     }
+
 
     private void actionBar() {
         TextView title_collection = findViewById(R.id.title_collection);
@@ -410,18 +457,21 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+
+
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (exoplayer != null && !hasFocus) {
+    protected void onPause() {
+        super.onPause();
+        if (exoplayer != null) {
             exoplayer.pause();
-        } else if (exoplayer != null && hasFocus) {
-            exoplayer.play();
         }
     }
 
     @Override
     public void onBackPressed() {
+        if (exoplayer != null) {
+            exoplayer.pause();
+        }
         if (fullscreenActive) {
             fullscreenActive = false;
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
@@ -434,6 +484,8 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
         }
     }
+
+
 }
 
 class ScreenShotModel {
