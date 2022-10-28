@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), VideosList.class);
                 intent.putExtra("Title", "Trending Videos");
+                intent.putExtra("url", "https://spankbang.com/trending_videos/");
                 startActivity(intent);
             }
         });
@@ -134,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), VideosList.class);
                 intent.putExtra("Title", "Upcoming Videos");
+                intent.putExtra("url", "https://spankbang.com/upcoming/");
+
                 startActivity(intent);
             }
         });
@@ -154,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), VideosList.class);
                 intent.putExtra("Title", "Popular Videos");
+                intent.putExtra("url", "https://spankbang.com/most_popular/");
+
                 startActivity(intent);
             }
         });
@@ -174,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), VideosList.class);
                 intent.putExtra("Title", "New Videos");
+                intent.putExtra("url", "https://spankbang.com/new_videos/");
+
                 startActivity(intent);
             }
         });

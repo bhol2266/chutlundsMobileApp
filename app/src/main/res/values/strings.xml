@@ -23,4 +23,37 @@
     <string name="close">Close</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+
+    <string-array name="filter">
+        <item>All</item>
+        <item>Trending</item>
+        <item>New</item>
+        <item>Popular</item>
+        <item>Featured</item>
+    </string-array>
+
+    <string-array name="qualtiy">
+        <item>All</item>
+        <item>720p</item>
+        <item>1080p</item>
+        <item>4K</item>
+    </string-array>
+
+    <string-array name="duration">
+        <item>All</item>
+        <item>10+min</item>
+        <item>20+min</item>
+        <item>40+min</item>
+    </string-array>
+
+    <string-array name="date">
+        <item>All</item>
+        <item>Today</item>
+        <item>This Week</item>
+        <item>This Month</item>
+        <item>This Year</item>
+    </string-array>
+
+
 </resources>

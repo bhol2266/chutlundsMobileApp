@@ -37,8 +37,8 @@
       android:layout_height="match_parent"/>
 
     <ProgressBar android:id="@id/exo_buffering"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="65dp"
+      android:layout_height="65dp"
       android:indeterminate="true"
         android:indeterminateTint="@color/themeColor"
       android:layout_gravity="center"/>
