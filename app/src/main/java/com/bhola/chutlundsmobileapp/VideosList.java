@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -12,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +44,7 @@ public class VideosList extends AppCompatActivity {
     ArrayList<String> filteredObject;
     ProgressBar progressbar;
     String CurrentPageNum = "1";
+    boolean noVideosFromAPI = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -265,35 +268,13 @@ public class VideosList extends AppCompatActivity {
         });
 
         LinearLayout date = findViewById(R.id.date);
-        duration.setOnClickListener(new View.OnClickListener() {
+        date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 spinnerDate.performClick();
             }
         });
 
-
-    }
-
-    private void customiseSpangbangURL(String gotoPage) {
-        String newURL = SPANGBANG_URL_API + gotoPage + "/?";
-        if (filteredObject.size() == 0) {
-            newURL = SPANGBANG_URL_API + gotoPage;
-        } else {
-
-            for (int i = 0; i < filteredObject.size(); i++) {
-                if (i == 0) {
-                    newURL = newURL + filteredObject.get(i);
-                } else {
-                    newURL = newURL + "&" + filteredObject.get(i);
-                }
-            }
-        }
-
-        Log.d(TAG, "customiseSpangbangURL: " + newURL);
-        progressbar.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
-        getVideoData_API(newURL);
 
     }
 
@@ -311,18 +292,32 @@ public class VideosList extends AppCompatActivity {
                     JSONArray jsonArray = jsonObject.getJSONArray("finalDataArray");
                     JSONArray pagesArray = jsonObject.getJSONArray("pages");
 
+                    noVideosFromAPI = jsonObject.getBoolean("noVideos");
+                    if (noVideosFromAPI) {
+                        setVideosNotFoundMessage();
+                    }
+
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
                         collectonData.add(videoModel);
                     }
+
                     if (pageData.size() > 0) pageData.clear();
                     for (int i = 0; i < pagesArray.length(); i++) {
                         pageData.add((String) pagesArray.get(i));
                     }
-                    Log.d(TAG, "onResponse: "+pageData);
-                    if (pageData.size() != 0) setPageNumber(pageData);
+                    LinearLayout pageNumberLayout = findViewById(R.id.pageNumberLayout);
+                    if (pageData.size() != 0) {
+                        setPageNumber(pageData);
+                        pageNumberLayout.setVisibility(View.VISIBLE);
 
+                    } else {
+                        pageData.add("1");
+                        pageData.add("1");
+                        setPageNumber(pageData);
+                        pageNumberLayout.setVisibility(View.VISIBLE);
+                    }
                     progressbar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                     adapter = new VideosAdapter(VideosList.this, collectonData);
@@ -359,14 +354,49 @@ public class VideosList extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    private void setPageNumber(List<String> pageData) {
+    private void setVideosNotFoundMessage() {
+        Button notFoundGoback = findViewById(R.id.notFoundGoback);
+        LinearLayout notFoundMessageLayout = findViewById(R.id.notFoundMessageLayout);
+        notFoundMessageLayout.setVisibility(View.VISIBLE);
+        notFoundGoback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        Log.d(TAG, "setPageNumber: "+pageData);
+            }
+        });
+    }
+
+    private void customiseSpangbangURL(String gotoPage) {
+        Log.d(TAG, "filteredObject: " + filteredObject);
+        String newURL = SPANGBANG_URL_API + gotoPage + "/?";
+        if (filteredObject.size() == 0) {
+            newURL = SPANGBANG_URL_API + gotoPage;
+        } else {
+
+            for (int i = 0; i < filteredObject.size(); i++) {
+                if (i == 0) {
+                    newURL = newURL + filteredObject.get(i);
+                } else {
+                    newURL = newURL + "&" + filteredObject.get(i);
+                }
+            }
+        }
+
+        progressbar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        //this is because the nested scrollview get scrolled little bit itself
+        NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView);
+        nestedScrollView.scrollTo(0, 0);
+        getVideoData_API(newURL);
+
+    }
+
+    private void setPageNumber(List<String> pageData) {
 
         TextView pageleft = findViewById(R.id.pageleft);
         TextView pageRight = findViewById(R.id.pageRight);
         TextView pageInfo = findViewById(R.id.pageInfoTextView);
-        pageInfo.setText(CurrentPageNum + "/" + pageData.get(1) + " " + "PAGES");
+        pageInfo.setText(CurrentPageNum + "/" + pageData.get(1) + " " + "Page");
 
         pageleft.setVisibility(View.VISIBLE);
         pageRight.setVisibility(View.VISIBLE);
@@ -378,8 +408,12 @@ public class VideosList extends AppCompatActivity {
         if (CurrentPageNum.equals(pageData.get(1))) {
             pageleft.setVisibility(View.VISIBLE);
             pageRight.setVisibility(View.GONE);
-
         }
+        if (pageData.get(0).equals(pageData.get(1))) { //in case only one page is there 1/1 page
+            pageleft.setVisibility(View.GONE);
+            pageRight.setVisibility(View.GONE);
+        }
+
         pageleft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

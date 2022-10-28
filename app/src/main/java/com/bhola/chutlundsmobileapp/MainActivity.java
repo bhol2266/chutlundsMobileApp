@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -92,7 +93,40 @@ public class MainActivity extends AppCompatActivity {
         upcomingVideos();
         popularVideos();
         newVideos();
+        searchBar();
 
+    }
+
+    private void searchBar() {
+        ImageView searchIcon = findViewById(R.id.searchIcon);
+        LinearLayout searchBar = findViewById(R.id.searchBar);
+        TextView goSearch = findViewById(R.id.goSearch);
+        EditText searchKeyword = findViewById(R.id.searchKeyword);
+
+        searchIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (searchBar.getVisibility() == View.VISIBLE) {
+                    searchBar.setVisibility(View.GONE);
+                } else {
+                    searchBar.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        goSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (searchKeyword.getText().toString().length() == 0) {
+                    Toast.makeText(MainActivity.this, "Enter keyword", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(v.getContext(), VideosList.class);
+                    intent.putExtra("Title", "search:"+searchKeyword.getText().toString().trim());
+                    intent.putExtra("url", "https://spankbang.com/s/"+searchKeyword.getText().toString().trim()+"/");
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     private void trendingVideos() {

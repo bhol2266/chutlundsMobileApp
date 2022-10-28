@@ -16,8 +16,8 @@
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:outlineSpotShadowColor="@color/themeColor"
             android:outlineAmbientShadowColor="@color/themeColor"
+            android:outlineSpotShadowColor="@color/themeColor"
             card_view:cardElevation="20dp"
             tools:targetApi="p">
 
@@ -74,6 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:orientation="horizontal"
+
             android:padding="5dp">
 
             <LinearLayout
@@ -82,6 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/background"
                 android:gravity="left"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
@@ -90,15 +92,17 @@
 
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center_vertical"
                     android:src="@drawable/filter" />
 
                 <Spinner
                     android:id="@+id/spinnerFilter"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
+                    android:dropDownWidth="100dp"
                     android:background="@null"
                     android:dropDownVerticalOffset="32dp"
                     android:spinnerMode="dropdown">
@@ -112,59 +116,66 @@
                 android:id="@+id/quality"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="3dp"
+                android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:background="@drawable/background"
+                android:gravity="left"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="10dp">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center_vertical"
-                    android:src="@drawable/setting" />
+                    android:src="@drawable/quality" />
 
                 <Spinner
                     android:id="@+id/spinnerQuality"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="5dp"
+                    android:dropDownWidth="100dp"
                     android:background="@null"
                     android:dropDownVerticalOffset="32dp"
-                    android:spinnerMode="dropdown" />
+                    android:spinnerMode="dropdown">
+                </Spinner>
+
+
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/duration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3dp"
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:background="@drawable/background"
+                android:gravity="left"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="10dp">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/repeat" />
 
                 <Spinner
                     android:id="@+id/spinnerDuration"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="5dp"
+                    android:dropDownWidth="100dp"
                     android:background="@null"
                     android:dropDownVerticalOffset="32dp"
-                    android:spinnerMode="dropdown" />
+                    android:spinnerMode="dropdown">
+                </Spinner>
+
+
             </LinearLayout>
 
 
@@ -172,82 +183,40 @@
                 android:id="@+id/date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
                 android:layout_weight="1"
-                android:gravity="right"
+                android:background="@drawable/background"
+                android:gravity="left"
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="10dp">
 
+
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/calendar" />
 
                 <Spinner
                     android:id="@+id/spinnerDate"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
+                    android:dropDownWidth="120dp"
                     android:background="@null"
-
                     android:dropDownVerticalOffset="32dp"
-                    android:spinnerMode="dropdown" />
+                    android:spinnerMode="dropdown">
+
+                </Spinner>
+
 
             </LinearLayout>
 
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/pageleft"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/hooverffext"
-                android:paddingLeft="35dp"
-                android:paddingRight="35dp"
-                android:text="&lt;"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="25dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/pageInfoTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:paddingLeft="25dp"
-                android:paddingRight="25dp"
-                android:text="PAGE..."
-                android:textSize="20dp" />
-
-
-            <TextView
-                android:id="@+id/pageRight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/hooverffext"
-                android:paddingLeft="35dp"
-                android:paddingRight="35dp"
-                android:text="&gt;"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="25dp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progressbar"
@@ -256,11 +225,118 @@
             android:layout_gravity="center"
             android:indeterminateTint="@color/themeColor" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/pageNumberLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="50dp"
+                    android:layout_marginBottom="50dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/pageleft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/hooverffext"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="25dp"
+                        android:text="&lt;"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff"
+                        android:textSize="25dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/pageInfoTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="25dp"
+                        android:text="PAGE..."
+                        android:textSize="18dp" />
+
+
+                    <TextView
+                        android:id="@+id/pageRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/hooverffext"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="25dp"
+                        android:text="&gt;"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff"
+                        android:textSize="25dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+
+        <LinearLayout
+            android:id="@+id/notFoundMessageLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/notfound" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="We could not find any videos" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Repeat your search with another keyword or filter"
+                android:textAlignment="center"
+                android:textColor="@color/themeColor"
+                android:textSize="16dp" />
+
+            <Button
+                android:id="@+id/notFoundGoback"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/hooverffext"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:text="Go Back" />
+
+        </LinearLayout>
 
 
     </LinearLayout>
