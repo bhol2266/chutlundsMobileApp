@@ -6,12 +6,12 @@
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
           <Key>
-            <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\bhola\.android\avd\Android_9_Emulator.avd" />
+            <type value="SERIAL_NUMBER" />
+            <value value="R5CT30JFQEW" />
           </Key>
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2022-10-28T07:33:35.393170700Z" />
+    <timeTargetWasSelectedWithDropDown value="2022-10-28T08:24:30.735456200Z" />
   </component>
 </project>
