@@ -9,20 +9,24 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="match_parent"
         android:layout_height="190dp"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp"
+        android:paddingLeft="45dp"
+        android:paddingRight="45dp"
         android:scaleType="fitXY"
-        app:srcCompat="@drawable/app_icon" />
+        app:srcCompat="@drawable/xxx" />
 
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background2"
-        android:fontFamily="@font/kalam_regular"
         android:paddingStart="10dp"
         android:paddingTop="5dp"
-        android:text="देसी हिंदी कहानियां"
-        android:textColor="#DF6969"
+        android:fontFamily="@font/kalam_regular"
+        android:text="Chutlunds.live"
         android:textSize="30dp"
+        android:paddingLeft="20dp"
+        android:textColor="@color/light_black"
         android:textStyle="bold" />
 
 

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/videoDialogLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
+
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/exolayerView"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_gravity="center"
+        app:played_color="@color/themeColor"
+        style="@style/CustomDialog"
+        app:shutter_background_color="@android:color/transparent"
+        app:resize_mode="fit"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        app:scrubber_color="@color/themeColor"
+        app:show_buffering="when_playing"
+        app:show_shuffle_button="false"
+        app:use_controller="false" />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/thumbnailImage2"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:scaleType="fitCenter"-->
+<!--        app:srcCompat="@drawable/ic_launcher_background" />-->
+
+    <ProgressBar
+        android:id="@+id/progressbar2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_margin="15dp"
+        android:indeterminateTint="@color/themeColor" />
+
+
+</FrameLayout>

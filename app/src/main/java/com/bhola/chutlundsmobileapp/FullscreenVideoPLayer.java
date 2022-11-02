@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -24,6 +25,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -56,6 +58,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +72,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     ProgressBar videoProgressBar;
     LinearLayout recyclerViewLinearLayout;
     ProgressBar activityProgressBar;
-    private String TAG = "jsonObject";
+    private String TAG = "TAGA";
     ExoPlayer exoplayer;
     StyledPlayerView playerView;
     TextView videoQualityTextview;
@@ -79,9 +82,11 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     public static List<String> video_qualities_available_withURL;
     public static List<ScreenShotModel> screenshotsMap;
     public static List<VideoModel> relatedVideos;
-    boolean fullscreenActive;
+    public static List<String> tagsArray;
+    boolean fullscreenActive = false;
     float videoAspectRatio;
     AlertDialog dialog;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +132,6 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         TextView likesText = findViewById(R.id.likes);
         likesText.setText(likedPercent);
 
-
         exoplayer = new ExoPlayer.Builder(FullscreenVideoPLayer.this).build();
         playerView = findViewById(R.id.exolayerView);
         playerView.setShowPreviousButton(false);
@@ -136,19 +140,14 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         playerView.getControllerHideOnTouch();
         playerView.setControllerShowTimeoutMs(3000);
         playerView.setControllerAutoShow(true);
+        playerView.setShowVrButton(true);
+
         playerView.setKeepScreenOn(true);
 
-//        videoQualityTextview=playerView.findViewById(R.id.videoQualityTextview);
-//        videoQualityTextview.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                videoQuality_dialog();
-//            }
-//        });
+        spinner = findViewById(R.id.spinner1);
 
-        Spinner spinner = findViewById(R.id.spinner1);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner, video_qualities_available);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_videoplayer, video_qualities_available);
         adapter.setDropDownViewResource(R.layout.spinneritem);
         spinner.setAdapter(adapter);
         int spinnerPosition = video_qualities_available.indexOf(preloaded_video_quality);
@@ -160,7 +159,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 int current_position = (int) exoplayer.getCurrentPosition();
-                if (current_position != 0  || video_qualities_available.indexOf(preloaded_video_quality) != position ) {
+                if (current_position != 0 || video_qualities_available.indexOf(preloaded_video_quality) != position) {
                     exoplayer.stop();
                     playerView.hideController();
                     MediaItem mediaItem = MediaItem.fromUri(video_qualities_available_withURL.get(position));
@@ -186,8 +185,8 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
             @Override
             public void onFullscreenButtonClick(boolean isFullScreen) {
                 Log.d(TAG, "isFullScreen: " + isFullScreen);
-                if (!isFullScreen) {
-                    fullscreenActive = false;
+                fullscreenActive = !fullscreenActive;
+                if (!fullscreenActive) {
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                     WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
@@ -200,7 +199,6 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                     } else {
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     }
-                    fullscreenActive = true;
                     getWindow().getDecorView().setSystemUiVisibility(
                             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -226,8 +224,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         });
 
         playerView.setPlayer(exoplayer);
-
-
+//        int videoQualityForPlayingIndex = getDeviceScreenResolution();
         MediaItem mediaItem = MediaItem.fromUri(VideoSrc);
         exoplayer.setMediaItem(mediaItem);
         exoplayer.prepare();
@@ -250,10 +247,12 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                     JSONArray video_qualities_Array_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("video_qualities_available");
                     JSONArray video_qualitiesURL_Array_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("video_qualities_available_withURL");
                     JSONArray screenshotsArray_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("screenshotsArray");
+                    JSONArray tagsArray_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("tagsArray");
                     video_qualities_available = new ArrayList<>();
                     video_qualities_available_withURL = new ArrayList<>();
                     screenshotsMap = new ArrayList<>();
                     relatedVideos = new ArrayList<>();
+                    tagsArray = new ArrayList<>();
 
                     for (int i = 0; i < video_qualities_Array_JSON.length(); i++) {
                         video_qualities_available.add(video_qualities_Array_JSON.getString(i));
@@ -261,6 +260,10 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                     for (int i = 0; i < video_qualitiesURL_Array_JSON.length(); i++) {
                         video_qualities_available_withURL.add(video_qualitiesURL_Array_JSON.getString(i));
                     }
+                    for (int i = 0; i < tagsArray_JSON.length(); i++) {
+                        tagsArray.add(tagsArray_JSON.getString(i));
+                    }
+
 
                     for (int i = 0; i < screenshotsArray_JSON.length(); i++) {
                         JSONObject jsonObject1 = screenshotsArray_JSON.getJSONObject(i);
@@ -290,6 +293,9 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
 
                     prepare_videoPlayer();
+                    setTagsInLayout();
+                    setScreenShotsInLayout();
+                    setVideoQualtiyInLayout();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -321,10 +327,89 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
+    private void setTagsInLayout() {
+
+        LinearLayout tagsLayout = findViewById(R.id.tagsLayout);
+        for (int i = 0; i < tagsArray.size(); i++) {
+
+            String tagKey = tagsArray.get(i).trim();
+            View view = getLayoutInflater().inflate(R.layout.tag, null);
+            TextView tag = view.findViewById(R.id.tag);
+            tag.setText(tagKey);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(5, 5, 15, 5);
+            tag.setLayoutParams(params);
+
+            tag.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), VideosList.class);
+                    intent.putExtra("Title",   tagKey);
+                    intent.putExtra("url", "https://spankbang.com/s/" + tagKey + "/");
+                    startActivity(intent);
+                }
+            });
+
+            tagsLayout.addView(view);
+        }
+    }
+
+    private void setVideoQualtiyInLayout() {
+
+        LinearLayout videoQualityLayout = findViewById(R.id.videoQualtiyLayout);
+        for (int i = 0; i < video_qualities_available.size(); i++) {
+            int positionn = i;
+            View view = getLayoutInflater().inflate(R.layout.videoquality, null);
+            TextView quality = view.findViewById(R.id.videoQualtyTextview);
+            quality.setText(video_qualities_available.get(i));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 10, 0);
+            quality.setLayoutParams(params);
+
+            quality.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int current_position = (int) exoplayer.getCurrentPosition();
+                    spinner.setSelection(positionn);
+                    playerView.performClick();
+                }
+            });
+            videoQualityLayout.addView(view);
+        }
+    }
+
+    private void setScreenShotsInLayout() {
+
+        LinearLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        RecyclerView recyclerViewScreenshot = findViewById(R.id.recyclerViewScreenshot);
+
+        ScreenShotAdapter screenShotAdapter = new ScreenShotAdapter((Context) FullscreenVideoPLayer.this, screenshotsMap, exoplayer);
+        recyclerViewScreenshot.setLayoutManager(layoutManager);
+        recyclerViewScreenshot.setAdapter(screenShotAdapter);
+
+        TextView openScreenshotALayout = findViewById(R.id.openScreenshotALayout);
+        openScreenshotALayout.setVisibility(View.VISIBLE);
+        openScreenshotALayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (recyclerViewScreenshot.getVisibility() == View.GONE) {
+                    recyclerViewScreenshot.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerViewScreenshot.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+    }
+
 
     private void setVideoPlayerHeight_PORTRAIT(String orientation) {
         linearLayoutStatusbar.setVisibility(View.VISIBLE);
         recyclerViewLinearLayout.setVisibility(View.VISIBLE);
+
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -433,6 +518,25 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     }
 
+    private int getDeviceScreenResolution() {
+        int videoQualityForPlayingIndex = 0;
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+
+        for (int i = 0; i < video_qualities_available.size(); i++) {
+            if (video_qualities_available.get(i).equals(String.valueOf(width) + "p")) {
+                videoQualityForPlayingIndex = i;
+            }
+        }
+        if (videoQualityForPlayingIndex == 0) {
+            return video_qualities_available_withURL.size() - 1;
+        } else {
+            return videoQualityForPlayingIndex;
+
+        }
+    }
+
 
     private void actionBar() {
         TextView title_collection = findViewById(R.id.title_collection);
@@ -458,7 +562,6 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -469,9 +572,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (exoplayer != null) {
-            exoplayer.pause();
-        }
+
         if (fullscreenActive) {
             fullscreenActive = false;
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
@@ -480,7 +581,12 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
             windowInsetsCompat.show(WindowInsetsCompat.Type.statusBars());
             setVideoPlayerHeight_PORTRAIT("landscape");
         } else {
-            super.onBackPressed();
+            if (exoplayer != null) {
+                exoplayer.pause();
+                exoplayer.stop();
+                exoplayer.clearMediaItems();
+                super.onBackPressed();
+            }
 
         }
     }

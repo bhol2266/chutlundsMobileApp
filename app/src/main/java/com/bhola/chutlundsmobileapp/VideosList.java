@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
@@ -45,6 +46,10 @@ public class VideosList extends AppCompatActivity {
     ProgressBar progressbar;
     String CurrentPageNum = "1";
     boolean noVideosFromAPI = false;
+    Spinner spinnerFilter, spinnerQuality, spinnerDuration, spinnerDate;
+    NestedScrollView nestedScrollView;
+    LinearLayout notFoundMessageLayout;
+    Button notFoundGoback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +60,22 @@ public class VideosList extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         progressbar = findViewById(R.id.progressbar);
         recyclerView.setLayoutManager(layoutManager);
+
+        //Not found layout
+        nestedScrollView = findViewById(R.id.nestedScrollView);
+        notFoundMessageLayout = findViewById(R.id.notFoundMessageLayout);
+        notFoundGoback = findViewById(R.id.notFoundGoback);
+
         SPANGBANG_URL_API = getIntent().getStringExtra("url");
-        getVideoData_API(SPANGBANG_URL_API);
+        getVideoData_API(SPANGBANG_URL_API + "?o=all");
+        Log.d(TAG, "onCreate: " + SPANGBANG_URL_API + "?o=all");
         filteredObject = new ArrayList<>();
         videoListFilters();
     }
 
     private void videoListFilters() {
 
-        Spinner spinnerFilter = findViewById(R.id.spinnerFilter);
+        spinnerFilter = findViewById(R.id.spinnerFilter);
         String[] arrayFilter = getResources().getStringArray(R.array.filter);
 
         ArrayAdapter<String> adapterFilter = new ArrayAdapter<String>(this, R.layout.spinner, arrayFilter);
@@ -96,7 +108,6 @@ public class VideosList extends AppCompatActivity {
 
                 if (position != 0) {
                     filteredObject.add((String) filterMap.get(arrayFilter[position]));
-                    Log.d(TAG, "SPANGBANG_URL_API: " + SPANGBANG_URL_API);
                     Log.d(TAG, "filteredObject: " + filteredObject);
                     customiseSpangbangURL("1");
                 }
@@ -109,7 +120,7 @@ public class VideosList extends AppCompatActivity {
         });
 
 
-        Spinner spinnerQuality = findViewById(R.id.spinnerQuality);
+        spinnerQuality = findViewById(R.id.spinnerQuality);
         String[] arrayQuality = getResources().getStringArray(R.array.qualtiy);
         ArrayAdapter<String> adapterQuality = new ArrayAdapter<String>(this, R.layout.spinner, arrayQuality);
         adapterQuality.setDropDownViewResource(R.layout.spinneritem);
@@ -154,7 +165,7 @@ public class VideosList extends AppCompatActivity {
         });
 
 
-        Spinner spinnerDuration = findViewById(R.id.spinnerDuration);
+        spinnerDuration = findViewById(R.id.spinnerDuration);
         String[] arrayDuration = getResources().getStringArray(R.array.duration);
         ArrayAdapter<String> adapterDuration = new ArrayAdapter<String>(this, R.layout.spinner, arrayDuration);
         adapterDuration.setDropDownViewResource(R.layout.spinneritem);
@@ -198,7 +209,7 @@ public class VideosList extends AppCompatActivity {
         });
 
 
-        Spinner spinnerDate = findViewById(R.id.spinnerDate);
+        spinnerDate = findViewById(R.id.spinnerDate);
         String[] arrayDate = getResources().getStringArray(R.array.date);
         ArrayAdapter<String> adapterDate = new ArrayAdapter<String>(this, R.layout.spinner, arrayDate);
         adapterDate.setDropDownViewResource(R.layout.spinneritem);
@@ -295,8 +306,8 @@ public class VideosList extends AppCompatActivity {
                     noVideosFromAPI = jsonObject.getBoolean("noVideos");
                     if (noVideosFromAPI) {
                         setVideosNotFoundMessage();
+                        return;
                     }
-
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
@@ -305,8 +316,11 @@ public class VideosList extends AppCompatActivity {
 
                     if (pageData.size() > 0) pageData.clear();
                     for (int i = 0; i < pagesArray.length(); i++) {
-                        pageData.add((String) pagesArray.get(i));
+                        pageData.add(pagesArray.get(i).toString().trim().replaceAll(" ", ""));
                     }
+                    Log.d(TAG, "pageData: " + pagesArray);
+                    Log.d(TAG, "collectonData: " + collectonData.size());
+
                     LinearLayout pageNumberLayout = findViewById(R.id.pageNumberLayout);
                     if (pageData.size() != 0) {
                         setPageNumber(pageData);
@@ -355,35 +369,63 @@ public class VideosList extends AppCompatActivity {
     }
 
     private void setVideosNotFoundMessage() {
-        Button notFoundGoback = findViewById(R.id.notFoundGoback);
-        LinearLayout notFoundMessageLayout = findViewById(R.id.notFoundMessageLayout);
+        nestedScrollView.setVisibility(View.GONE);
+        progressbar.setVisibility(View.GONE);
         notFoundMessageLayout.setVisibility(View.VISIBLE);
         notFoundGoback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (filteredObject.size() != 0) {
+                    Log.d(TAG, "filteredObject: " + filteredObject);
+                    if (filteredObject.get(filteredObject.size() - 1).contains("o="))
+                        spinnerFilter.setSelection(0);
+                    if (filteredObject.get(filteredObject.size() - 1).contains("q="))
+                        spinnerQuality.setSelection(0);
+                    if (filteredObject.get(filteredObject.size() - 1).contains("p="))
+                        spinnerDate.setSelection(0);
+                    if (filteredObject.get(filteredObject.size() - 1).contains("d="))
+                        spinnerDuration.setSelection(0);
 
+                    filteredObject.remove(filteredObject.size() - 1);
+                    customiseSpangbangURL("1");
+                    notFoundMessageLayout.setVisibility(View.GONE);
+                    nestedScrollView.setVisibility(View.VISIBLE);
+                    progressbar.setVisibility(View.VISIBLE);
+                } else {
+                    onBackPressed();
+                }
             }
         });
     }
 
     private void customiseSpangbangURL(String gotoPage) {
+        boolean baseFilterAvailable = false; // o=all
         Log.d(TAG, "filteredObject: " + filteredObject);
         String newURL = SPANGBANG_URL_API + gotoPage + "/?";
         if (filteredObject.size() == 0) {
-            newURL = SPANGBANG_URL_API + gotoPage;
+            newURL = SPANGBANG_URL_API + gotoPage + "/?o=all";
         } else {
 
             for (int i = 0; i < filteredObject.size(); i++) {
+                if (filteredObject.get(i).contains("o=")) {
+                    baseFilterAvailable = true;
+                }
                 if (i == 0) {
                     newURL = newURL + filteredObject.get(i);
                 } else {
                     newURL = newURL + "&" + filteredObject.get(i);
                 }
             }
+            if (!baseFilterAvailable) {
+                newURL = newURL + "&o=all";
+            }
         }
+        Log.d(TAG, "SPANGBANG_URL_API: " + newURL);
 
         progressbar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
+        notFoundMessageLayout.setVisibility(View.GONE);
+        nestedScrollView.setVisibility(View.VISIBLE);
         //this is because the nested scrollview get scrolled little bit itself
         NestedScrollView nestedScrollView = findViewById(R.id.nestedScrollView);
         nestedScrollView.scrollTo(0, 0);
@@ -393,13 +435,15 @@ public class VideosList extends AppCompatActivity {
 
     private void setPageNumber(List<String> pageData) {
 
+
+        TextView pageNumberTop = findViewById(R.id.pageNumber);
         TextView pageleft = findViewById(R.id.pageleft);
         TextView pageRight = findViewById(R.id.pageRight);
         TextView pageInfo = findViewById(R.id.pageInfoTextView);
         pageInfo.setText(CurrentPageNum + "/" + pageData.get(1) + " " + "Page");
+        pageNumberTop.setText(CurrentPageNum + "/" + pageData.get(1));
 
-        pageleft.setVisibility(View.VISIBLE);
-        pageRight.setVisibility(View.VISIBLE);
+
         if (CurrentPageNum.equals("1")) {
             pageleft.setVisibility(View.GONE);
             pageRight.setVisibility(View.VISIBLE);
@@ -409,7 +453,7 @@ public class VideosList extends AppCompatActivity {
             pageleft.setVisibility(View.VISIBLE);
             pageRight.setVisibility(View.GONE);
         }
-        if (pageData.get(0).equals(pageData.get(1))) { //in case only one page is there 1/1 page
+        if (pageData.get(1).equals("1")) { //in case only one page is there 1/1 page
             pageleft.setVisibility(View.GONE);
             pageRight.setVisibility(View.GONE);
         }

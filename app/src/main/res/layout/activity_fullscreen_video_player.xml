@@ -14,22 +14,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:outlineSpotShadowColor="@color/themeColor"
             android:outlineAmbientShadowColor="@color/themeColor"
+            android:outlineSpotShadowColor="@color/themeColor"
             card_view:cardElevation="20dp"
-            android:layout_marginBottom="20dp"
             tools:targetApi="p">
 
             <RelativeLayout
                 android:id="@+id/relativelayoutt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/themeColor"
-           >
+                android:background="@color/themeColor">
 
                 <ImageView
                     android:id="@+id/back_arrow"
@@ -73,8 +72,6 @@
         </androidx.cardview.widget.CardView>
 
 
-
-
     </LinearLayout>
 
 
@@ -82,8 +79,7 @@
         android:id="@+id/exoplayerFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/black"
-     >
+        android:background="@android:color/black">
 
         <ImageView
             android:id="@+id/thumbnailImageView"
@@ -98,14 +94,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            app:resize_mode="fit"
-            app:played_color="@color/themeColor"
-            app:unplayed_color="#48FFFFFF"
-            app:scrubber_color="@color/themeColor"
-            app:player_layout_id="@layout/custom_player_view"
             app:controller_layout_id="@layout/custom_control_view"
+            app:played_color="@color/themeColor"
+            app:player_layout_id="@layout/custom_player_view"
+            app:resize_mode="fit"
+            app:scrubber_color="@color/themeColor"
             app:show_buffering="when_playing"
-            app:show_shuffle_button="true" />
+            app:show_shuffle_button="true"
+            app:unplayed_color="#48FFFFFF" />
 
 
         <ProgressBar
@@ -116,123 +112,179 @@
             android:indeterminateTint="#ffffff" />
     </FrameLayout>
 
-
-    <LinearLayout
-        android:id="@+id/recyclerViewLinearLayout"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <!--    VideoTitle textview-->
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="sdafsadfsdafsadfsadfsadfads"
-            android:textSize="18dp" />
+        android:layout_height="match_parent">
 
         <LinearLayout
-
-            android:id="@+id/videoDetailBar"
             android:layout_width="match_parent"
-            android:layout_height="27dp"
-            android:layout_marginLeft="7dp"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
+                android:id="@+id/recyclerViewLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    app:srcCompat="@drawable/clock" />
 
+                <LinearLayout
+
+                    android:id="@+id/videoDetailBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="27dp"
+                    android:layout_marginLeft="7dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            app:srcCompat="@drawable/clock" />
+
+                        <TextView
+                            android:id="@+id/duration"
+                            style="@style/ThumbnailText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:text="150000" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+
+                        <ImageView
+                            android:layout_width="23dp"
+                            android:layout_height="23dp"
+                            app:srcCompat="@drawable/eye" />
+
+                        <TextView
+                            android:id="@+id/views"
+                            style="@style/ThumbnailText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:text="150000" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            app:srcCompat="@drawable/heart" />
+
+                        <TextView
+                            android:id="@+id/likes"
+                            style="@style/ThumbnailText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:text="150000" />
+
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <!--    VideoTitle textview-->
                 <TextView
-                    android:id="@+id/duration"
-                    style="@style/ThumbnailText"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="150000" />
+                    android:layout_margin="5dp"
+                    android:text="sdafsadfsdafsadfsadfsadfads"
+                    android:textSize="18dp" />
 
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-
-                <ImageView
-                    android:layout_width="23dp"
+                <LinearLayout
+                    android:id="@+id/videoQualtiyLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="23dp"
-                    app:srcCompat="@drawable/eye" />
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:id="@+id/tagsLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
 
                 <TextView
-                    android:id="@+id/views"
-                    style="@style/ThumbnailText"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/openScreenshotALayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="150000" />
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/hooverffext"
+                    android:padding="5dp"
+                    android:text="Screenshots"
+                    android:textAlignment="center"
+                    android:textSize="16dp"
+                    android:visibility="gone" />
 
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    app:srcCompat="@drawable/heart" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewScreenshot"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
 
                 <TextView
-                    android:id="@+id/likes"
-                    style="@style/ThumbnailText"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/relatedVideos"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="150000" />
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="Related Videos"
+                    android:textColor="@color/primaryDark"
+                    android:textSize="18dp"
+                    android:visibility="gone" />
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
-
-
         </LinearLayout>
-
-
-
-        <TextView
-            android:id="@+id/relatedVideos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
-            android:text="Related Videos"
-            android:textColor="@color/primaryDark"
-            android:textSize="18dp"
-            android:visibility="gone" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 
 </LinearLayout>

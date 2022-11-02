@@ -4,56 +4,32 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabItem;
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
@@ -64,11 +40,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.Time;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import soup.neumorphism.NeumorphButton;
 
@@ -94,6 +71,43 @@ public class MainActivity extends AppCompatActivity {
         popularVideos();
         newVideos();
         searchBar();
+        categorySlider();
+
+    }
+
+    private void categorySlider() {
+        ArrayList<HashMap<String, String>> Category_List = new ArrayList<HashMap<String, String>>();
+        HashMap<String, String> m_li;
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset());
+            JSONArray m_jArry = obj.getJSONArray("category");
+
+            for (int i = 0; i < m_jArry.length(); i++) {
+                JSONObject json_obj = m_jArry.getJSONObject(i);
+
+                String name = json_obj.getString("name");
+                String url = json_obj.getString("url");
+
+                //Add your values in your `ArrayList` as below:
+                m_li = new HashMap<String, String>();
+                m_li.put("name", name);
+                m_li.put("url", url);
+                Category_List.add(m_li);
+            }
+            Collections.shuffle(Category_List);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d(TAG, "categorySlider: " + e.getMessage());
+
+        }
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+
+        RecyclerView recyclerView_categorySlider = findViewById(R.id.recyclerView_categorySlider);
+        recyclerView_categorySlider.setLayoutManager(layoutManager);
+        CategorySliderAdapter adapter = new CategorySliderAdapter(MainActivity.this, Category_List);
+        recyclerView_categorySlider.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
     }
 
@@ -121,12 +135,27 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Enter keyword", Toast.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(v.getContext(), VideosList.class);
-                    intent.putExtra("Title", "search:"+searchKeyword.getText().toString().trim());
-                    intent.putExtra("url", "https://spankbang.com/s/"+searchKeyword.getText().toString().trim()+"/");
+                    intent.putExtra("Title", searchKeyword.getText().toString().trim());
+                    intent.putExtra("url", "https://spankbang.com/s/" + searchKeyword.getText().toString().trim() + "/");
                     startActivity(intent);
                 }
             }
         });
+
+
+        searchKeyword.setImeActionLabel("Search", EditorInfo.IME_ACTION_UNSPECIFIED);
+        searchKeyword.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    goSearch.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
     }
 
     private void trendingVideos() {
@@ -141,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
 
-        TextView trendingVideos = findViewById(R.id.trendingVideos);
+        LinearLayout trendingVideos = findViewById(R.id.trendingVideos);
         trendingVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-        TextView trendingVideos = findViewById(R.id.upcomingVideos);
+        LinearLayout trendingVideos = findViewById(R.id.upcomingVideos);
         trendingVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-        TextView trendingVideos = findViewById(R.id.popularVideos);
+        LinearLayout trendingVideos = findViewById(R.id.popularVideos);
         trendingVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-        TextView trendingVideos = findViewById(R.id.newVideos);
+        LinearLayout trendingVideos = findViewById(R.id.newVideos);
         trendingVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -222,11 +251,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void getAPI_DATA() {
-//        String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
-//        API_CONFIG.HomepageVideoAPI(API_URL, MainActivity.this);
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+            InputStream is = MainActivity.this.getAssets().open("category.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
     }
-
 
     @Override
     public void onBackPressed() {
@@ -353,6 +392,11 @@ public class MainActivity extends AppCompatActivity {
                         i.setData(Uri.parse(SplashScreen.Main_App_url1));
                         startActivity(i);
                         drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case R.id.menu_notificaton:
+
+                       startActivity(new Intent(MainActivity.this,Category.class));
                         break;
 
 
@@ -527,6 +571,70 @@ class Adapter extends RecyclerView.Adapter<Adapter.viewholder> {
         }
 
 
+    }
+}
+
+
+class CategorySliderAdapter extends RecyclerView.Adapter<CategorySliderAdapter.viewholder> {
+
+    Context context;
+    ArrayList<HashMap<String, String>> collectionData;
+
+
+    public CategorySliderAdapter(Context context, ArrayList<HashMap<String, String>> collectionData) {
+        this.context = context;
+        this.collectionData = collectionData;
+    }
+
+    @NonNull
+    @Override
+    public viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+
+        View view = layoutInflater.inflate(R.layout.category_slider_item, parent, false);
+        return new viewholder(view);
+    }
+
+    @Override
+    public void onViewRecycled(viewholder holder) {
+        super.onViewRecycled(holder);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull viewholder holder, int position) {
+        String url = collectionData.get(position).get("url");
+        String title = collectionData.get(position).get("name").replace(".png", "").toUpperCase();
+
+        Picasso.with(context).load(url).into(holder.thumbnail);
+        holder.title.setText(title);
+
+        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), VideosList.class);
+                intent.putExtra("Title", title.trim().toLowerCase());
+                intent.putExtra("url", "https://spankbang.com/s/" + title.trim().toLowerCase() + "/");
+                v.getContext().startActivity(intent);
+            }
+        });
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return collectionData.size();
+    }
+
+
+    public class viewholder extends RecyclerView.ViewHolder {
+        ImageView thumbnail;
+        TextView title;
+
+        public viewholder(@NonNull View itemView) {
+            super(itemView);
+            thumbnail = itemView.findViewById(R.id.imageview);
+            title = itemView.findViewById(R.id.categorytextview);
+        }
     }
 }
 

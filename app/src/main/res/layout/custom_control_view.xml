@@ -99,11 +99,14 @@
                 android:layout_height="wrap_content"
                 android:spinnerMode="dialog" />
 
+
+
             <ImageButton
                 android:id="@id/exo_settings"
                 style="@style/ExoStyledControls.Button.Bottom.Settings" />
 
             <ImageButton
+                android:tag="fullscreenTag"
                 android:id="@id/exo_fullscreen"
                 style="@style/ExoStyledControls.Button.Bottom.FullScreen" />
 
