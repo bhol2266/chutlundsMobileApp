@@ -39,6 +39,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -75,21 +76,25 @@ public class SplashScreen extends AppCompatActivity {
     public static String Ads_State = "inactive";
     public static String DB_NAME = "MCB_Story";
     public static String Notification_ImageURL = "https://hotdesipics.co/wp-content/uploads/2022/06/Hot-Bangla-Boudi-Ki-Big-Boobs-Nangi-Selfies-_002.jpg";
-    DatabaseReference url_mref;
     public static int Login_Times = 0;
+    public static int Firebase_Version_Code = 0;
+    public static String apk_Downloadlink = "";
+    public static String countryLocation = "";
+    public static String countryCode = "";
     public static List<VideoModel> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
 
     Handler handlerr;
     boolean API_LOAD_FINISHED = false;
     boolean LOTTIE_ANIM_FINISHED = false;
+    boolean FIREBASE_LOADED = false;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fullscreenMode();
         setContentView(R.layout.splash_screen);
-
-
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         allUrl();
 //        readJSON();
         sharedPrefrences();
@@ -113,7 +118,7 @@ public class SplashScreen extends AppCompatActivity {
                 progressbar.setVisibility(View.VISIBLE);
                 LOTTIE_ANIM_FINISHED = true;
 
-                if (API_LOAD_FINISHED) {
+                if (API_LOAD_FINISHED && FIREBASE_LOADED) {
                     startActivity(new Intent(SplashScreen.this, MainActivity.class));
                 }
             }
@@ -141,49 +146,26 @@ public class SplashScreen extends AppCompatActivity {
     }
 
 
-
     private void allUrl() {
-        if (!isInternetAvailable(this)) {
 
-            Handler handler2 = new Handler();
-            handler2.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                }
-            }, 2000);
-
-            return;
-        } else {
-            handlerr = new Handler();
-            handlerr.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                }
-            }, 9000);
-
-        }
-        url_mref = FirebaseDatabase.getInstance().getReference().child("Hindi_desi_Kahani-2");
-        url_mref.addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference();
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Refer_App_url2 = (String) snapshot.child("Refer_App_url2").getValue();
-                Ads_State = (String) snapshot.child("Ads").getValue();
-                Ad_Network_Name = (String) snapshot.child("Ad_Network").getValue();
-                Notification_ImageURL = (String) snapshot.child("Notification_ImageURL").getValue();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Firebase_Version_Code =  dataSnapshot.child("version_code").getValue(Integer.class);
+                apk_Downloadlink =  dataSnapshot.child("apk_Downloadlink").getValue().toString();
 
-                Handler handler2 = new Handler();
-                handler2.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        handlerr.removeCallbacksAndMessages(null);
-                    }
-                }, 500);
-
+                FIREBASE_LOADED=true;
+                if (API_LOAD_FINISHED && LOTTIE_ANIM_FINISHED) {
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
 
@@ -272,7 +254,7 @@ public class SplashScreen extends AppCompatActivity {
                             }
 
                             API_LOAD_FINISHED = true;
-                            if (LOTTIE_ANIM_FINISHED) {
+                            if (LOTTIE_ANIM_FINISHED && FIREBASE_LOADED) {
                                 startActivity(new Intent(SplashScreen.this, MainActivity.class));
                             }
 

@@ -132,7 +132,8 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         TextView likesText = findViewById(R.id.likes);
         likesText.setText(likedPercent);
 
-        exoplayer = new ExoPlayer.Builder(FullscreenVideoPLayer.this).build();
+        exoplayer = new ExoPlayer.Builder(FullscreenVideoPLayer.this).setSeekBackIncrementMs(10000)
+                .setSeekForwardIncrementMs(10000).build();
         playerView = findViewById(R.id.exolayerView);
         playerView.setShowPreviousButton(false);
         playerView.setShowNextButton(false);
@@ -345,7 +346,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), VideosList.class);
-                    intent.putExtra("Title",   tagKey);
+                    intent.putExtra("Title", tagKey);
                     intent.putExtra("url", "https://spankbang.com/s/" + tagKey + "/");
                     startActivity(intent);
                 }

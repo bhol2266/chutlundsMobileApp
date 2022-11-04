@@ -15,6 +15,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -23,22 +25,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.tasks.Task;
+import com.google.gson.JsonArray;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import soup.neumorphism.NeumorphButton;
 
@@ -72,14 +85,94 @@ public class MainActivity extends AppCompatActivity {
         newVideos();
         searchBar();
         categorySlider();
+        checkForAppUpdate();
+        getUserLocaitonUsingIP();
 
+    }
+
+    private void getUserLocaitonUsingIP() {
+        String API_URL = " https://api.db-ip.com/v2/free/self";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, API_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            SplashScreen.countryLocation = jsonObject.getString("countryName");
+                            SplashScreen.countryCode = jsonObject.getString("countryCode");
+                            showLocationVideos();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "JSONException: " + e.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "onErrorResponse: " + error.getMessage());
+            }
+        });
+        RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void showLocationVideos() throws JSONException {
+        JSONArray jsonArrayyy = new JSONArray(loadJSONFromAsset("CountryList" + ".json"));
+        for (int j = 0; j < jsonArrayyy.length(); j++) {
+            JSONObject obj = (JSONObject) jsonArrayyy.get(j);
+            if (obj.getString("CountryName").toString().toLowerCase().trim().equals(SplashScreen.countryLocation.trim().toLowerCase())) {
+                getVideoData_API("https://spankbang.com/s/" + obj.getString("language").trim().toLowerCase() + "/?o=all");
+            }
+        }
+
+    }
+
+    private void checkForAppUpdate() {
+        if (SplashScreen.Firebase_Version_Code != BuildConfig.VERSION_CODE) {
+
+            Button updateBtn;
+            TextView yourVersion, latestVersion;
+            final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
+            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+            View promptView = inflater.inflate(R.layout.appupdate, null);
+            builder.setView(promptView);
+            builder.setCancelable(true);
+
+
+            updateBtn = promptView.findViewById(R.id.UpdateBtn);
+            yourVersion = promptView.findViewById(R.id.currentVersion);
+            yourVersion.setText("Your Version: " + BuildConfig.VERSION_CODE);
+            latestVersion = promptView.findViewById(R.id.NewerVersion);
+            latestVersion.setText("Latest Version: " + SplashScreen.Firebase_Version_Code);
+            updateBtn = promptView.findViewById(R.id.UpdateBtn);
+
+            updateBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(SplashScreen.apk_Downloadlink));
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        Log.d(TAG, "Exception: " + e.getMessage());
+                    }
+                }
+            });
+
+
+            AlertDialog dialog2 = builder.create();
+            dialog2.show();
+        }
     }
 
     private void categorySlider() {
         ArrayList<HashMap<String, String>> Category_List = new ArrayList<HashMap<String, String>>();
         HashMap<String, String> m_li;
         try {
-            JSONObject obj = new JSONObject(loadJSONFromAsset());
+            JSONObject obj = new JSONObject(loadJSONFromAsset("category.json"));
             JSONArray m_jArry = obj.getJSONArray("category");
 
             for (int i = 0; i < m_jArry.length(); i++) {
@@ -155,7 +248,85 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        searchKeyword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    suggestedTagsShow(s.toString().trim().toLowerCase(), searchKeyword);
+                } catch (JSONException e) {
+                    Log.d(TAG, "afterTextChanged: " + e.getMessage());
+                }
+            }
+        });
+
+
+    }
+
+    private void suggestedTagsShow(String searchKey, EditText searchKeyword) throws JSONException {
+        LinearLayout suggestedtagsLayout = findViewById(R.id.suggestedtagsLayout);
+        suggestedtagsLayout.removeAllViews();
+
+        char[] tagsArrayFilename = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+        ArrayList alltags = new ArrayList();
+
+        if (searchKey.length() < 3) {
+            return;
+        }
+        String FIRST_LETTER = searchKey.substring(0, 1).toUpperCase();
+        JSONArray jsonArray = new JSONArray(loadJSONFromAsset("tags/" + FIRST_LETTER + ".json"));
+        for (int j = 0; j < jsonArray.length(); j++) {
+            if (jsonArray.get(j).toString().contains(searchKey)) {
+                alltags.add(jsonArray.get(j));
+            }
+        }
+
+        for (int i = 0; i < tagsArrayFilename.length; i++) {
+            if (i == 10 || String.valueOf(tagsArrayFilename[i]).equals(FIRST_LETTER)) {
+            } else {
+
+                JSONArray jsonArrayyy = new JSONArray(loadJSONFromAsset("tags/" + tagsArrayFilename[i] + ".json"));
+                for (int j = 0; j < jsonArrayyy.length(); j++) {
+                    if (jsonArrayyy.get(j).toString().contains(searchKey)) {
+                        alltags.add(jsonArrayyy.get(j));
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < alltags.size(); i++) {
+
+            View view = getLayoutInflater().inflate(R.layout.suggested_textview, null);
+            TextView suggestedText = view.findViewById(R.id.spinnerText);
+            String tagText = alltags.get(i).toString().trim().toLowerCase();
+            suggestedText.setText(tagText);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(5, 5, 15, 5);
+            suggestedText.setLayoutParams(params);
+
+            suggestedText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    searchKeyword.setText(tagText);
+                    Intent intent = new Intent(v.getContext(), VideosList.class);
+                    intent.putExtra("Title", tagText);
+                    intent.putExtra("url", "https://spankbang.com/s/" + tagText + "/");
+                    startActivity(intent);
+                }
+            });
+
+            suggestedtagsLayout.addView(view);
+        }
     }
 
     private void trendingVideos() {
@@ -251,10 +422,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public String loadJSONFromAsset() {
+    public String loadJSONFromAsset(String filename) {
         String json = null;
         try {
-            InputStream is = MainActivity.this.getAssets().open("category.json");
+            InputStream is = MainActivity.this.getAssets().open(filename);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -396,7 +567,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case R.id.menu_notificaton:
 
-                       startActivity(new Intent(MainActivity.this,Category.class));
+                        startActivity(new Intent(MainActivity.this, Category.class));
                         break;
 
 
@@ -488,6 +659,90 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void getVideoData_API(String bodyURL) {
+        List<VideoModel> collectonData = new ArrayList<>();
+        List<String> pageData = new ArrayList<>();
+        RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.live/api/spangbang/getvideos", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //let's parse json data
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("finalDataArray");
+                    JSONArray pagesArray = jsonObject.getJSONArray("pages");
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
+                        collectonData.add(videoModel);
+                    }
+
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
+                    TextView textView = findViewById(R.id.countryNameTextviews);
+                    int flagOffset = 0x1F1E6;
+                    int asciiOffset = 0x41;
+
+                    String country = SplashScreen.countryCode;
+
+                    int firstChar = Character.codePointAt(country, 0) - asciiOffset + flagOffset;
+                    int secondChar = Character.codePointAt(country, 1) - asciiOffset + flagOffset;
+
+                    String flag = new String(Character.toChars(firstChar))
+                            + new String(Character.toChars(secondChar));
+                    textView.setText("Popular videos in " + SplashScreen.countryLocation + " " + flag);
+                    TextView NavbarChutlundsTitle=findViewById(R.id.NavbarChutlundsTitle);
+                    NavbarChutlundsTitle.setText("Chutlunds.live " + flag);
+
+
+                    RecyclerView recyclerView_Country = findViewById(R.id.recyclerView_Country);
+                    LinearLayout countryVideoTopbar = findViewById(R.id.countryVideoTopbar);
+                    countryVideoTopbar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(v.getContext(), VideosList.class);
+                            intent.putExtra("Title", "Popular in " + SplashScreen.countryLocation+ flag);
+                            intent.putExtra("url", bodyURL);
+                            startActivity(intent);
+                        }
+                    });
+                    LinearLayout countryVideo = findViewById(R.id.countryVideo);
+                    countryVideo.setVisibility(View.VISIBLE);
+                    Adapter adapter = new Adapter(MainActivity.this, collectonData);
+                    recyclerView_Country.setLayoutManager(layoutManager);
+                    recyclerView_Country.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "JSONException: " + e.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "onErrorResponse: " + error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("url", bodyURL);
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Content-Type", "application/x-www-form-urlencoded");
+                return params;
+            }
+        };
+
+        requestQueue.add(stringRequest);
     }
 
 
