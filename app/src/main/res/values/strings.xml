@@ -16,7 +16,6 @@
     <string name="Facebbok_InterstitialAdUnit">998670014223210_998671504223061</string>
 
 
-    <string name="facebook_app_id">[998670014223210]</string>
 
 
     <string name="open">Open</string>
@@ -54,6 +53,13 @@
         <item>This Month</item>
         <item>This Year</item>
     </string-array>
+
+
+
+    <string name="facebook_app_id">412940630805200</string>
+    <string name="fb_login_protocol_scheme">fb412940630805200</string>
+    <string name="facebook_client_token">9250834abdd521bd2b6f8902dd166c7f</string>
+
 
 
 </resources>

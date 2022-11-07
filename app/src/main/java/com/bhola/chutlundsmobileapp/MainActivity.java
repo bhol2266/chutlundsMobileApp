@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,18 +40,25 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.tasks.OnCompleteListener;
 import com.google.android.play.core.tasks.Task;
-import com.google.gson.JsonArray;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog dialog;
     private ReviewManager reviewManager;
 
+    //Google login
+    GoogleSignInOptions gso;
+    GoogleSignInClient gsc;
+    MenuItem menu_login;
+    TextView email;
+    LinearLayout loggedInLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         categorySlider();
         checkForAppUpdate();
         getUserLocaitonUsingIP();
-
+        checkLogin();
     }
 
     private void getUserLocaitonUsingIP() {
@@ -215,7 +230,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (searchBar.getVisibility() == View.VISIBLE) {
                     searchBar.setVisibility(View.GONE);
+                    searchIcon.setImageResource(R.drawable.search);
+
                 } else {
+                    searchIcon.setImageResource(R.drawable.close);
                     searchBar.setVisibility(View.VISIBLE);
                 }
             }
@@ -693,7 +711,7 @@ public class MainActivity extends AppCompatActivity {
                     String flag = new String(Character.toChars(firstChar))
                             + new String(Character.toChars(secondChar));
                     textView.setText("Popular videos in " + SplashScreen.countryLocation + " " + flag);
-                    TextView NavbarChutlundsTitle=findViewById(R.id.NavbarChutlundsTitle);
+                    TextView NavbarChutlundsTitle = findViewById(R.id.NavbarChutlundsTitle);
                     NavbarChutlundsTitle.setText("Chutlunds.live " + flag);
 
 
@@ -703,7 +721,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(v.getContext(), VideosList.class);
-                            intent.putExtra("Title", "Popular in " + SplashScreen.countryLocation+ flag);
+                            intent.putExtra("Title", "Popular in " + SplashScreen.countryLocation + flag);
                             intent.putExtra("url", bodyURL);
                             startActivity(intent);
                         }
@@ -743,6 +761,89 @@ public class MainActivity extends AppCompatActivity {
         };
 
         requestQueue.add(stringRequest);
+    }
+
+
+    private void checkLogin() {
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navmenu);
+        View headerView = navigationView.getHeaderView(0);
+        loggedInLayout = headerView.findViewById(R.id.loggedInLayout);
+        Menu menu = navigationView.getMenu();
+
+        menu_login = menu.findItem(R.id.menu_login);
+        email = headerView.findViewById(R.id.email);
+
+        googleLoginStuffs();
+        facebookLoginStuffs();
+
+        menu_login.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (loggedInLayout.getVisibility() == View.GONE) {
+                    startActivity(new Intent(MainActivity.this, login.class));
+                } else {
+                    String LoginWith = "google";
+                    if (LoginWith.equals("google")) {
+                        loggedInLayout.setVisibility(View.GONE);
+                        menu_login.setTitle("Log In");
+                        gsc.signOut().addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                                drawerLayout.closeDrawer(Gravity.LEFT);
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        })
+                        ;
+                    } else if (LoginWith.equals("facebook")) {
+                        LoginManager.getInstance().logOut();
+                        drawerLayout.closeDrawer(Gravity.LEFT);
+                        finish();
+                        startActivity(getIntent());
+                    }
+                }
+                return false;
+            }
+        });
+
+
+    }
+
+    private void facebookLoginStuffs() {
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        GraphRequest request = GraphRequest.newMeRequest(
+                accessToken,
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject object,
+                            GraphResponse response) {
+                        // Application code
+                        Log.d(TAG, "onCompleted: "+object);
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link,email,picture.type(large");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    private void googleLoginStuffs() {
+
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        gsc = GoogleSignIn.getClient(this, gso);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            menu_login.setTitle("Log Out");
+            loggedInLayout.setVisibility(View.VISIBLE);
+            String personName = acct.getDisplayName();
+            String personEmail = acct.getEmail();
+//            name.setText(personName);
+            email.setText(personEmail);
+        }
     }
 
 
