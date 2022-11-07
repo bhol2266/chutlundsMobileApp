@@ -301,6 +301,15 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         String FIRST_LETTER = searchKey.substring(0, 1).toUpperCase();
+
+        JSONArray spangbangTags_array = new JSONArray(loadJSONFromAsset("tags/spangbang_tags.json"));
+        for (int j = 0; j < spangbangTags_array.length(); j++) {
+            if (spangbangTags_array.get(j).toString().contains(searchKey)) {
+                alltags.add(spangbangTags_array.get(j));
+            }
+        }
+
+
         JSONArray jsonArray = new JSONArray(loadJSONFromAsset("tags/" + FIRST_LETTER + ".json"));
         for (int j = 0; j < jsonArray.length(); j++) {
             if (jsonArray.get(j).toString().contains(searchKey)) {
