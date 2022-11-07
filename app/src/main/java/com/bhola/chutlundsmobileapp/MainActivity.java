@@ -336,9 +336,9 @@ public class MainActivity extends AppCompatActivity {
             TextView suggestedText = view.findViewById(R.id.spinnerText);
             String tagText = alltags.get(i).toString().trim().toLowerCase();
             suggestedText.setText(tagText);
-
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(5, 5, 15, 5);
+            view.setBackgroundResource(R.drawable.tagshovereffect);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//            params.setMargins(5, 5, 15, 5);
             suggestedText.setLayoutParams(params);
 
             suggestedText.setOnClickListener(new View.OnClickListener() {
