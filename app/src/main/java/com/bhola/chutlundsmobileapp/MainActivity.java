@@ -44,6 +44,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -54,6 +55,8 @@ import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.tasks.OnCompleteListener;
 import com.google.android.play.core.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -86,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
     MenuItem menu_login;
     TextView email;
     LinearLayout loggedInLayout;
+    public static boolean userLoggedIn = false;
+    public static String authProviderName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -783,34 +788,53 @@ public class MainActivity extends AppCompatActivity {
         menu_login = menu.findItem(R.id.menu_login);
         email = headerView.findViewById(R.id.email);
 
-        googleLoginStuffs();
-        facebookLoginStuffs();
-
         menu_login.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (loggedInLayout.getVisibility() == View.GONE) {
+                if (!userLoggedIn) {
                     startActivity(new Intent(MainActivity.this, login.class));
                 } else {
-                    String LoginWith = "google";
-                    if (LoginWith.equals("google")) {
-                        loggedInLayout.setVisibility(View.GONE);
-                        menu_login.setTitle("Log In");
+                    if (authProviderName.equals("google.com")) {
+                        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+                        gsc = GoogleSignIn.getClient(MainActivity.this, gso);
                         gsc.signOut().addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                                FirebaseAuth.getInstance().signOut();
+                                loggedInLayout.setVisibility(View.GONE);
                                 drawerLayout.closeDrawer(Gravity.LEFT);
                                 finish();
+                                menu_login.setTitle("Log In");
                                 startActivity(getIntent());
                             }
-                        })
-                        ;
-                    } else if (LoginWith.equals("facebook")) {
-                        LoginManager.getInstance().logOut();
+                        });
+
+                    }
+                    if (authProviderName.equals("facebook.com")) {
+
+
+                    }
+                    if (authProviderName.equals("password")) {
+                        FirebaseAuth.getInstance().signOut();
+                        loggedInLayout.setVisibility(View.GONE);
                         drawerLayout.closeDrawer(Gravity.LEFT);
                         finish();
+                        menu_login.setTitle("Log In");
                         startActivity(getIntent());
                     }
+                    userLoggedIn=false;
+
+//                    String LoginWith = "google";
+//                    if (LoginWith.equals("google")) {
+//                        loggedInLayout.setVisibility(View.GONE);
+//                        menu_login.setTitle("Log In");
+//
+//                    } else if (LoginWith.equals("facebook")) {
+//                        LoginManager.getInstance().logOut();
+//                        drawerLayout.closeDrawer(Gravity.LEFT);
+//                        finish();
+//                        startActivity(getIntent());
+//                    }
                 }
                 return false;
             }
@@ -830,7 +854,7 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject object,
                             GraphResponse response) {
                         // Application code
-                        Log.d(TAG, "onCompleted: "+object);
+                        Log.d(TAG, "onCompleted: " + object);
                     }
                 });
         Bundle parameters = new Bundle();
@@ -839,23 +863,30 @@ public class MainActivity extends AppCompatActivity {
         request.executeAsync();
     }
 
-    private void googleLoginStuffs() {
 
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        gsc = GoogleSignIn.getClient(this, gso);
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            authProviderName = user.getProviderData().get(user.getProviderData().size() - 1).getProviderId();
+            Log.d(TAG, "AuthProvider: " + authProviderName);
+            userLoggedIn = true;
             menu_login.setTitle("Log Out");
             loggedInLayout.setVisibility(View.VISIBLE);
-            String personName = acct.getDisplayName();
-            String personEmail = acct.getEmail();
+            String personName = user.getDisplayName();
+            String personEmail = user.getEmail();
 //            name.setText(personName);
             email.setText(personEmail);
         }
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        Log.d(TAG, "FirebaseUser: " + user);
+        Log.d(TAG, "GoogleSignInAccount: " + acct);
+
+
     }
-
-
 }
 
 

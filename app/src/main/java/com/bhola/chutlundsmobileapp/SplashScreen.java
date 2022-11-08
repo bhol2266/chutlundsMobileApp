@@ -3,7 +3,9 @@ package com.bhola.chutlundsmobileapp;
 
 import android.animation.Animator;
 import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -137,6 +139,17 @@ public class SplashScreen extends AppCompatActivity {
         if (isInternetAvailable(SplashScreen.this)) {
             String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
             HomepageVideoAPI(API_URL, this);
+        }else{
+            ProgressDialog  myDialog = new ProgressDialog(SplashScreen.this);
+            myDialog.setMessage("No internet connection!");
+            myDialog.setCancelable(false);
+            myDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Retry", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    myDialog.dismiss();//dismiss dialog
+                }
+            });
+            myDialog.show();
         }
 
 
@@ -267,6 +280,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, "onErrorResponse: " + error.getMessage());
+                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

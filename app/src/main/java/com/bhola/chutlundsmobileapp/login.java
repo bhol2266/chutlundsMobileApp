@@ -27,17 +27,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class login extends AppCompatActivity {
@@ -61,6 +63,7 @@ public class login extends AppCompatActivity {
 
     //Facebook
     CallbackManager callbackManager;
+    private static final String EMAIL = "email";
 
 
     //Credentials
@@ -98,7 +101,7 @@ public class login extends AppCompatActivity {
         signUpWithCredentials();
         loginWithCredentials();
         googleSignInStuffs();
-        facebookSignInStuffs();
+//        facebookSignInStuffs();
 
     }
 
@@ -167,7 +170,7 @@ public class login extends AppCompatActivity {
                 progressDialog.show();
 
 
-                firebaseAuth.signInWithEmailAndPassword(loginEmail_text, loginPassword_text).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                firebaseAuth.signInWithEmailAndPassword(loginEmail_text.trim(), loginPassword_text).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
                         progressDialog.cancel();
@@ -216,7 +219,8 @@ public class login extends AppCompatActivity {
                             Toast.makeText(login.this, "User not registered", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }                    }
+                        }
+                    }
                 });
 
             }
@@ -338,11 +342,11 @@ public class login extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(email_text, password_text).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        signUpComplete();
-                        Toast.makeText(login.this, "login now", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(login.this, "User Created Successfully, You can login now", Toast.LENGTH_SHORT).show();
                         progressDialog.cancel();
                         ArrayList<String> keyword = new ArrayList<>();
-                        firebaseFirestore.collection("Users").document(FirebaseAuth.getInstance().getUid()).set(new UserModel(fullname_text, email_text, SplashScreen.countryLocation, false, false, keyword));
+                        saveUserdataFireStore(fullname_text, email_text.trim(), SplashScreen.countryLocation, false, false, keyword);
+                        signUpComplete();
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -364,67 +368,33 @@ public class login extends AppCompatActivity {
     }
 
     private void LoginInComplete() {
+        finish();
+        Intent intent = new Intent(login.this, MainActivity.class);
+        startActivity(intent);
     }
 
 
     private void facebookSignInStuffs() {
-        LinearLayout loginFacebook = findViewById(R.id.loginFacebook);
-        loginFacebook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginManager.getInstance().logInWithReadPermissions(login.this, Arrays.asList("public_profile"));
-            }
-        });
-
         callbackManager = CallbackManager.Factory.create();
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//        if(accessToken!=null && !accessToken.isExpired()){
-//            navigateToSecondActivity();
-//        }
-
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        Log.d(TAG, "onSuccess: " + loginResult);
-                        navigateToSecondActivity();
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        // App code
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        Log.d(TAG, "onSuccess: " + exception.getMessage());
-                    }
-                });
-
-
-        String EMAIL = "email";
-
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email", "public_profile", "user_friends");
+        loginButton.setPermissions("email", "public_profile", "user_friends");
+//        String EMAIL = "email";
+//        loginButton.setPermissions(Arrays.asList(EMAIL));
 
-        loginButton.setReadPermissions(Arrays.asList(EMAIL));
-        // If you are using in a fragment, call loginButton.setFragment(this);
-
-        // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // App code
+                Log.d(TAG, "onSuccess: "+loginResult);
             }
 
             @Override
             public void onCancel() {
-                // App code
+                Log.d(TAG, "onCancel: ");
             }
 
             @Override
-            public void onError(FacebookException exception) {
-                Log.d(TAG, "loginButton: " + exception.getMessage());
+            public void onError(FacebookException error) {
+                Log.d(TAG, "FacebookException: "+error.getMessage());
             }
         });
     }
@@ -432,28 +402,21 @@ public class login extends AppCompatActivity {
     private void googleSignInStuffs() {
         googleBtn = findViewById(R.id.loginGoolge);
 
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         gsc = GoogleSignIn.getClient(this, gso);
-
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null) {
-            navigateToSecondActivity();
-        }
 
 
         googleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                progressDialog.show();
+                Intent signInIntent = gsc.getSignInIntent();
+                startActivityForResult(signInIntent, 1000);
             }
         });
 
     }
 
-    void signIn() {
-        Intent signInIntent = gsc.getSignInIntent();
-        startActivityForResult(signInIntent, 1000);
-    }
 
     public static boolean isValid(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
@@ -469,16 +432,28 @@ public class login extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1000) {
             //Google
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
-                task.getResult(ApiException.class);
-                navigateToSecondActivity();
-            } catch (ApiException e) {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+                firebaseAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            progressDialog.cancel();
+                            ArrayList<String> keyword = new ArrayList<>();
+                            saveUserdataFireStore(account.getDisplayName(), account.getEmail(), SplashScreen.countryLocation, false, false, keyword);
+                            LoginInComplete();
 
+                        } else {
+                            Toast.makeText(login.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            } catch (ApiException e) {
                 Log.d(TAG, "onActivityResult: " + e.getMessage());
             }
         } else {
@@ -486,13 +461,22 @@ public class login extends AppCompatActivity {
             callbackManager.onActivityResult(requestCode, resultCode, data);
 
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    void navigateToSecondActivity() {
-        finish();
-        Intent intent = new Intent(login.this, MainActivity.class);
-        startActivity(intent);
+    private void saveUserdataFireStore(String displayName, String email, String countryLocation, boolean verified, boolean membership, ArrayList<String> keyword) {
+        firebaseFirestore.collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getEmail()).set(new UserModel(displayName, email, SplashScreen.countryLocation, verified, membership, keyword)).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(login.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }
 
 class UserModel {
