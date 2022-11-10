@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         checkForAppUpdate();
         getUserLocaitonUsingIP();
         checkLogin();
+
     }
 
     private void getUserLocaitonUsingIP() {
@@ -747,6 +748,7 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView_Country.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
 
+                    startActivity(new Intent(MainActivity.this,AdsterraAds.class));
 
                 } catch (JSONException e) {
                     e.printStackTrace();

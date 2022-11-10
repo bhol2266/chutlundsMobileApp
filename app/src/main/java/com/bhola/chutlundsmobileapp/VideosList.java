@@ -1,5 +1,6 @@
 package com.bhola.chutlundsmobileapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -337,6 +338,8 @@ public class VideosList extends AppCompatActivity {
                     adapter = new VideosAdapter(VideosList.this, collectonData);
                     recyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
+                    startActivity(new Intent(VideosList.this,AdsterraAds.class));
+
 
 
                 } catch (JSONException e) {
