@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class AdsterraAds extends AppCompatActivity {
-    private WebView webView, webView2;
+    private WebView webView;
     LinearLayout closelayout;
 
     @Override
@@ -27,7 +27,6 @@ public class AdsterraAds extends AppCompatActivity {
         String url3 = "https://www.chutlunds.live/ads/ads.html";
 
         webView = (WebView) findViewById(R.id.webview);
-        webView2 = (WebView) findViewById(R.id.webvie2);
         closelayout = findViewById(R.id.closelayout);
         closelayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,17 +46,7 @@ public class AdsterraAds extends AppCompatActivity {
             }
         });
 
-        webView2.setWebViewClient(new WebViewClient());
-        webView2.loadUrl(url2);
-        WebSettings webSettings2 = webView2.getSettings();
-        webSettings2.setJavaScriptEnabled(true);
-        webView2.setWebViewClient(new WebViewClient() {
 
-            public void onPageFinished(WebView view, String url) {
-                Toast.makeText(AdsterraAds.this, "Loaded", Toast.LENGTH_SHORT).show();
-                closelayout.setVisibility(View.VISIBLE);
-            }
-        });
 
     }
 
