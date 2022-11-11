@@ -208,7 +208,6 @@ public class MainActivity extends AppCompatActivity {
                 m_li.put("url", url);
                 Category_List.add(m_li);
             }
-            Collections.shuffle(Category_List);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -485,7 +484,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void exit_dialog() {
 
-
         NeumorphButton exit, exit2;
         final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(nav.getContext());
         LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
@@ -748,7 +746,7 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView_Country.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
 
-                    startActivity(new Intent(MainActivity.this,AdsterraAds.class));
+//                    startActivity(new Intent(MainActivity.this,AdsterraAds.class));
 
                 } catch (JSONException e) {
                     e.printStackTrace();

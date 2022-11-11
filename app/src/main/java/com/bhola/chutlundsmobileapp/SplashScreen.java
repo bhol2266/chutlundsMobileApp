@@ -91,6 +91,8 @@ public class SplashScreen extends AppCompatActivity {
     boolean FIREBASE_LOADED = false;
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    public static int adsLoaded = 1; //0,2=dont load   1= load
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,8 +141,8 @@ public class SplashScreen extends AppCompatActivity {
         if (isInternetAvailable(SplashScreen.this)) {
             String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
             HomepageVideoAPI(API_URL, this);
-        }else{
-            ProgressDialog  myDialog = new ProgressDialog(SplashScreen.this);
+        } else {
+            ProgressDialog myDialog = new ProgressDialog(SplashScreen.this);
             myDialog.setMessage("No internet connection!");
             myDialog.setCancelable(false);
             myDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Retry", new DialogInterface.OnClickListener() {
@@ -166,10 +168,10 @@ public class SplashScreen extends AppCompatActivity {
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Firebase_Version_Code =  dataSnapshot.child("version_code").getValue(Integer.class);
-                apk_Downloadlink =  dataSnapshot.child("apk_Downloadlink").getValue().toString();
+                Firebase_Version_Code = dataSnapshot.child("version_code").getValue(Integer.class);
+                apk_Downloadlink = dataSnapshot.child("apk_Downloadlink").getValue().toString();
 
-                FIREBASE_LOADED=true;
+                FIREBASE_LOADED = true;
                 if (API_LOAD_FINISHED && LOTTIE_ANIM_FINISHED) {
                     startActivity(new Intent(SplashScreen.this, MainActivity.class));
                 }
