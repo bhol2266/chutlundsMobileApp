@@ -661,7 +661,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
                             public void onFinish() {
                                 SplashScreen.adsLoaded = 2;
-                                dialog[0].cancel();
+                                if (dialog[0] != null) dialog[0].hide();
                             }
                         }.start();
                     }
