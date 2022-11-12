@@ -86,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
     //Google login
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
-    MenuItem menu_login;
-    TextView email;
-    LinearLayout loggedInLayout;
+    public static  MenuItem menu_login;
+    public static TextView email;
+    public static LinearLayout loggedInLayout;
     public static boolean userLoggedIn = false;
     public static String authProviderName = "";
 
@@ -108,7 +108,12 @@ public class MainActivity extends AppCompatActivity {
         checkForAppUpdate();
         getUserLocaitonUsingIP();
         checkLogin();
+        loadAds();
 
+    }
+
+    private void loadAds() {
+        ExoclickAds.loadAds(MainActivity.this);
     }
 
     private void getUserLocaitonUsingIP() {
@@ -884,7 +889,6 @@ public class MainActivity extends AppCompatActivity {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         Log.d(TAG, "FirebaseUser: " + user);
         Log.d(TAG, "GoogleSignInAccount: " + acct);
-
 
     }
 }

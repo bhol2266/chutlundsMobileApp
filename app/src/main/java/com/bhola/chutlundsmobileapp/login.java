@@ -54,6 +54,7 @@ public class login extends AppCompatActivity {
     String password_text = "";
     String confirmPassword_text = "";
     ProgressDialog progressDialog;
+    String commingFrom = ""; //this is the intent from videoplayer acivity in case of user clicks download btn and user is not logged in and after login send the user back to the same video player activty
 
     //Google
     GoogleSignInOptions gso;
@@ -369,8 +370,17 @@ public class login extends AppCompatActivity {
 
     private void LoginInComplete() {
         finish();
-        Intent intent = new Intent(login.this, MainActivity.class);
-        startActivity(intent);
+
+        if (getIntent().getStringExtra("commingFrom").equals("videoplayerActivity")) {
+            Intent intent = new Intent(login.this, FullscreenVideoPLayer.class);
+            intent.putExtra("title", getIntent().getStringExtra("title"));
+            intent.putExtra("href", getIntent().getStringExtra("href"));
+            intent.putExtra("thumbnail", getIntent().getStringExtra("thumbnail"));
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(login.this, MainActivity.class);
+            startActivity(intent);
+        }
     }
 
 
@@ -384,7 +394,7 @@ public class login extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "onSuccess: "+loginResult);
+                Log.d(TAG, "onSuccess: " + loginResult);
             }
 
             @Override
@@ -394,7 +404,7 @@ public class login extends AppCompatActivity {
 
             @Override
             public void onError(FacebookException error) {
-                Log.d(TAG, "FacebookException: "+error.getMessage());
+                Log.d(TAG, "FacebookException: " + error.getMessage());
             }
         });
     }

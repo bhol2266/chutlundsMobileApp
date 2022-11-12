@@ -85,7 +85,6 @@ public class SplashScreen extends AppCompatActivity {
     public static String countryCode = "";
     public static List<VideoModel> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
 
-    Handler handlerr;
     boolean API_LOAD_FINISHED = false;
     boolean LOTTIE_ANIM_FINISHED = false;
     boolean FIREBASE_LOADED = false;

@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/rajdhani_regular"
-        android:text="Story already downloaded"
+        android:text="You need to Login first"
         android:textColor="#ffffff"
         android:textSize="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,13 +25,13 @@
 
 
     <TextView
-        android:id="@+id/gotoDownloads"
+        android:id="@+id/gotologins"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:fontFamily="@font/rajdhani_regular"
         android:gravity="right"
-        android:text="GO TO DOWNLOADS"
+        android:text="GO TO LOGIN"
         android:textColor="@color/themeColor"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

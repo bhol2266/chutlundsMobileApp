@@ -11,13 +11,17 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -26,11 +30,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
+import android.webkit.URLUtil;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -58,6 +65,12 @@ import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -95,6 +108,10 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     AlertDialog dialog;
     Spinner spinner;
 
+    //Download Manager
+    public final static String COLUMN_TOTAL_SIZE_BYTES = "total_size";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +147,67 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         videoDetailBar.setVisibility(View.VISIBLE);
         TextView relativelayout = findViewById(R.id.relatedVideos);
         relativelayout.setVisibility(View.VISIBLE);
+        Button downloadBtn = findViewById(R.id.downloadBtn);
+        downloadBtn.setVisibility(View.VISIBLE);
+        downloadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!MainActivity.userLoggedIn) {
+                    final Snackbar snackbar = Snackbar.make(v, "", Snackbar.LENGTH_LONG);
+                    View customSnackView = getLayoutInflater().inflate(R.layout.custom_snackbar_view, null);
+                    // now change the layout of the snackbar
+                    Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+
+                    TextView gotologins = customSnackView.findViewById(R.id.gotologins);
+                    gotologins.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent i = new Intent(FullscreenVideoPLayer.this, login.class);
+                            i.putExtra("commingFrom", "videoplayerActivity");
+                            i.putExtra("title", vidoetitle);
+                            i.putExtra("href", href);
+                            i.putExtra("thumbnail", thumbnail);
+                            startActivity(i);
+                        }
+                    });
+
+                    // add the custom snack bar layout to snackbar layout
+                    snackbarLayout.addView(customSnackView, 0);
+                    snackbar.show();
+                    return;
+                }
+
+                String downloadURL = video_qualities_available_withURL.get(spinner.getSelectedItemPosition());
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadURL));
+                String title = URLUtil.guessFileName(downloadURL, null, null);
+                request.setTitle((CharSequence) title);
+//                request.setDescription("Downloading video please wait...");
+                request.setAllowedOverMetered(true);
+                request.setAllowedOverRoaming(true);
+                request.setVisibleInDownloadsUi(true);
+                String cookie = CookieManager.getInstance().getCookie(downloadURL);
+                request.addRequestHeader("cookie", cookie);
+                request.allowScanningByMediaScanner();
+
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
+
+                DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                long downloadId = downloadManager.enqueue(request);
+
+                DownloadManager.Query q = new DownloadManager.Query();
+                q.setFilterById(downloadId);
+                Cursor cursor = downloadManager.query(q);
+                cursor.moveToFirst();
+                int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                final long dl_progress = (bytes_downloaded*100L)/bytes_total;
+                Log.d(TAG, "bytes_total: "+bytes_total);
+
+                Toast.makeText(FullscreenVideoPLayer.this, COLUMN_TOTAL_SIZE_BYTES, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         recyclerViewLinearLayout.setVisibility(View.VISIBLE);
         relatedVideosRecyclerView();
@@ -377,6 +455,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
             params.setMargins(0, 0, 10, 0);
             quality.setLayoutParams(params);
 
+
             quality.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -601,79 +680,25 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     }
 
     private void loadAds() {
-
-        if (SplashScreen.adsLoaded == 0 || SplashScreen.adsLoaded == 2) {
-            if (SplashScreen.adsLoaded == 0) SplashScreen.adsLoaded = 1;
-            if (SplashScreen.adsLoaded == 2) SplashScreen.adsLoaded = 0;
-            return;
-        }
-        final AlertDialog[] dialog = {null};
-
-        WebView webView = null;
-        LinearLayout closelayout;
-        TextView countDownText;
-
-        String url = "https://passablejeepparliament.com/pvpcafc4kk?key=f25a9b13a509037a68a314ca0278f644";
-        String url2 = "https://passablejeepparliament.com/uvm4sgmd?key=1a4c3d6da7024a80c0acf420460a907f";
-        final String[] url3 = {"https://www.chutlunds.live/ads/ads.html"};
-
-
-        final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(FullscreenVideoPLayer.this);
-        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
-        View promptView = inflater.inflate(R.layout.ads_dialog, null);
-        closelayout = promptView.findViewById(R.id.closelayout);
-        countDownText = promptView.findViewById(R.id.countDownText);
-        builder.setView(promptView);
-        builder.setCancelable(true);
-        dialog[0] = builder.create();
-
-
-        webView = (WebView) promptView.findViewById(R.id.webview);
-        closelayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog[0].cancel();
-            }
-        });
-
-        webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl(url3[0]);
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                Log.d("TAGA", "onPageStarted " + url);
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-
-                Log.d("TAGA", "onPageFinished " + url);
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog[0].show();
-                        new CountDownTimer(5000, 1000) {
-                            public void onTick(long millisUntilFinished) {
-                                countDownText.setText("Ad will end in  " + millisUntilFinished / 1000 + " seconds");
-                            }
-
-                            public void onFinish() {
-                                SplashScreen.adsLoaded = 2;
-                                if (dialog[0] != null) dialog[0].hide();
-                            }
-                        }.start();
-                    }
-                };
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(runnable, 2000);
-            }
-        });
-
-
+        ExoclickAds.loadAds(FullscreenVideoPLayer.this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            MainActivity.authProviderName = user.getProviderData().get(user.getProviderData().size() - 1).getProviderId();
+            Log.d(TAG, "AuthProvider: " + MainActivity.authProviderName);
+            MainActivity.userLoggedIn = true;
+            MainActivity.menu_login.setTitle("Log Out");
+            MainActivity.loggedInLayout.setVisibility(View.VISIBLE);
+            String personEmail = user.getEmail();
+            MainActivity.email.setText(personEmail);
+        }
+
+    }
 }
 
 class ScreenShotModel {
