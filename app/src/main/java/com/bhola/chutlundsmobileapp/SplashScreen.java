@@ -1,6 +1,8 @@
 package com.bhola.chutlundsmobileapp;
 
 
+import static com.google.android.ads.mediationtestsuite.utils.DataStore.getContext;
+
 import android.animation.Animator;
 import android.app.ActionBar;
 import android.app.ProgressDialog;
@@ -15,12 +17,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,13 +44,22 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.ads.OnPaidEventListener;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
@@ -75,14 +88,17 @@ public class SplashScreen extends AppCompatActivity {
     public static String Ad_Network_Name = "facebook";
     public static String Main_App_url1 = "https://play.google.com/store/apps/details?id=com.bhola.HindidesiKahaniya2";
     public static String Refer_App_url2 = "https://play.google.com/store/apps/developer?id=UK+DEVELOPERS";
-    public static String Ads_State = "inactive";
-    public static String DB_NAME = "MCB_Story";
+    public static String Ads_State = "active";
+    public static boolean update_Mandatory = true;
+    public static int admin_panel_passcode = -1;
     public static String Notification_ImageURL = "https://hotdesipics.co/wp-content/uploads/2022/06/Hot-Bangla-Boudi-Ki-Big-Boobs-Nangi-Selfies-_002.jpg";
     public static int Login_Times = 0;
     public static int Firebase_Version_Code = 0;
     public static String apk_Downloadlink = "";
     public static String countryLocation = "";
     public static String countryCode = "";
+    boolean internetAvailable = false;
+
     public static List<VideoModel> Trending_collectonData, Upcoming_collectonData, Popular_collectonData, New_collectonData;
 
     boolean API_LOAD_FINISHED = false;
@@ -122,7 +138,7 @@ public class SplashScreen extends AppCompatActivity {
                 LOTTIE_ANIM_FINISHED = true;
 
                 if (API_LOAD_FINISHED && FIREBASE_LOADED) {
-                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    gotoMainActivity();
                 }
             }
 
@@ -138,19 +154,22 @@ public class SplashScreen extends AppCompatActivity {
         });
 
         if (isInternetAvailable(SplashScreen.this)) {
+            internetAvailable = true;
             String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
             HomepageVideoAPI(API_URL, this);
         } else {
-            ProgressDialog myDialog = new ProgressDialog(SplashScreen.this);
-            myDialog.setMessage("No internet connection!");
-            myDialog.setCancelable(false);
-            myDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Retry", new DialogInterface.OnClickListener() {
+            internetAvailable = false;
+            Button noInternet = findViewById(R.id.noInternet);
+            TextView loadingText = findViewById(R.id.loadingText);
+            loadingText.setText("No internet...");
+            noInternet.setVisibility(View.VISIBLE);
+            noInternet.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    myDialog.dismiss();//dismiss dialog
+                public void onClick(View v) {
+                    finish();
+                    startActivity(new Intent(SplashScreen.this, SplashScreen.class));
                 }
             });
-            myDialog.show();
         }
 
 
@@ -168,11 +187,14 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Firebase_Version_Code = dataSnapshot.child("version_code").getValue(Integer.class);
+                admin_panel_passcode = dataSnapshot.child("admin_panel_passcode").getValue(Integer.class);
                 apk_Downloadlink = dataSnapshot.child("apk_Downloadlink").getValue().toString();
+                Ads_State = dataSnapshot.child("Ads_State").getValue().toString();
+                update_Mandatory = (boolean) dataSnapshot.child("update_Mandatory").getValue();
 
                 FIREBASE_LOADED = true;
                 if (API_LOAD_FINISHED && LOTTIE_ANIM_FINISHED) {
-                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    gotoMainActivity();
                 }
             }
 
@@ -269,7 +291,7 @@ public class SplashScreen extends AppCompatActivity {
 
                             API_LOAD_FINISHED = true;
                             if (LOTTIE_ANIM_FINISHED && FIREBASE_LOADED) {
-                                startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                                gotoMainActivity();
                             }
 
                         } catch (JSONException e) {
@@ -344,6 +366,13 @@ public class SplashScreen extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         }
+    }
+
+    private void gotoMainActivity() {
+        if (!internetAvailable) {
+            return;
+        }
+        startActivity(new Intent(SplashScreen.this, MainActivity.class));
     }
 
 

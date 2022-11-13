@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -49,14 +50,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.tasks.OnCompleteListener;
 import com.google.android.play.core.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -113,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         getUserLocaitonUsingIP();
         checkLogin();
         loadAds();
-
     }
 
     private void loadAds() {
@@ -132,9 +137,11 @@ public class MainActivity extends AppCompatActivity {
                             SplashScreen.countryLocation = jsonObject.getString("countryName");
                             SplashScreen.countryCode = jsonObject.getString("countryCode");
                             showLocationVideos();
+                            installsDB(); // record device id in firestore using android id
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            installsDB(); // record device id in firestore using android id
                             Log.d(TAG, "JSONException: " + e.getMessage());
                         }
                     }
@@ -168,7 +175,11 @@ public class MainActivity extends AppCompatActivity {
             LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
             View promptView = inflater.inflate(R.layout.appupdate, null);
             builder.setView(promptView);
-            builder.setCancelable(true);
+            if (SplashScreen.update_Mandatory) {
+                builder.setCancelable(false);
+            } else {
+                builder.setCancelable(true);
+            }
 
 
             updateBtn = promptView.findViewById(R.id.UpdateBtn);
@@ -234,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void searchBar() {
-         searchIcon = findViewById(R.id.searchIcon);
+        searchIcon = findViewById(R.id.searchIcon);
         searchBar = findViewById(R.id.searchBar);
         TextView goSearch = findViewById(R.id.goSearch);
         EditText searchKeyword = findViewById(R.id.searchKeyword);
@@ -503,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        NeumorphButton exit, exit2;
+        Button exit, exit2;
         final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(nav.getContext());
         LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
         View promptView = inflater.inflate(R.layout.exit_dialog, null);
@@ -571,29 +582,19 @@ public class MainActivity extends AppCompatActivity {
 
 
                     case R.id.menu_contacts:
-                        TextView whatsapp, email;
+                        TextView  email;
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
                         View promptView = inflater.inflate(R.layout.navigation_menu_contacts, null);
                         builder.setView(promptView);
                         builder.setCancelable(true);
-                        whatsapp = promptView.findViewById(R.id.whatsappnumber);
-                        whatsapp.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ClipboardManager clipboard = (ClipboardManager) v.getContext().getSystemService(CLIPBOARD_SERVICE);
-                                ClipData clip = ClipData.newPlainText("label", "+919108825914");
-                                clipboard.setPrimaryClip(clip);
-                                navigationDrawer();
-                                Toast.makeText(v.getContext(), "COPIED NUMBER", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+
                         email = promptView.findViewById(R.id.email);
                         email.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 ClipboardManager clipboard = (ClipboardManager) v.getContext().getSystemService(CLIPBOARD_SERVICE);
-                                ClipData clip = ClipData.newPlainText("label", "bhola2266@gmail.com");
+                                ClipData clip = ClipData.newPlainText("label", "ukdevelopers007@gmail.com");
                                 clipboard.setPrimaryClip(clip);
                                 Toast.makeText(v.getContext(), "COPIED EMAIL", Toast.LENGTH_SHORT).show();
                             }
@@ -606,14 +607,7 @@ public class MainActivity extends AppCompatActivity {
 
                         break;
 
-                    case R.id.menu_rating:
 
-
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(SplashScreen.Main_App_url1));
-                        startActivity(i);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        break;
 
                     case R.id.menu_notificaton:
 
@@ -622,10 +616,10 @@ public class MainActivity extends AppCompatActivity {
 
 
                     case R.id.menu_share_app:
-                        String share_msg = "Hi I have downloaded Hindi Desi Kahani App.\n" +
-                                "It is a best app for Real Desi Bed Stories.\n" +
+                        String share_msg = "Hi I have downloaded Chutlunds Mobile App.\n" +
+                                "It is a best app for Desi Videos and porn.\n" +
                                 "You should also try\n" +
-                                SplashScreen.Main_App_url1;
+                                SplashScreen.apk_Downloadlink;
                         Intent intent1 = new Intent();
                         intent1.setAction(Intent.ACTION_SEND);
                         intent1.putExtra(Intent.EXTRA_TEXT, share_msg);
@@ -635,21 +629,12 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawer(GravityCompat.START);
                         break;
 
-                    case R.id.menu_second_app:
-
-                        if (SplashScreen.Refer_App_url2.length() > 10) {
-                            Intent j = new Intent(Intent.ACTION_VIEW);
-                            j.setData(Uri.parse(SplashScreen.Refer_App_url2));
-                            startActivity(j);
-                            drawerLayout.closeDrawer(GravityCompat.START);
-                        }
-                        break;
 
                     case R.id.Privacy_Policy:
 
                         try {
                             Intent i5 = new Intent(Intent.ACTION_VIEW);
-                            i5.setData(Uri.parse("https://sites.google.com/view/desikhaniya"));
+                            i5.setData(Uri.parse("https://www.chutlunds.live/privacy"));
                             startActivity(i5);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -674,9 +659,13 @@ public class MainActivity extends AppCompatActivity {
 
 
                     case R.id.Terms_and_Condition:
-                        Intent intent27 = new Intent(getApplicationContext(), TermsAndConditions.class);
-                        startActivity(intent27);
-                        drawerLayout.closeDrawer(GravityCompat.START);
+                        try {
+                            Intent i5 = new Intent(Intent.ACTION_VIEW);
+                            i5.setData(Uri.parse("https://www.chutlunds.live/terms"));
+                            startActivity(i5);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         break;
                 }
 
@@ -882,6 +871,46 @@ public class MainActivity extends AppCompatActivity {
         request.executeAsync();
     }
 
+    private void installsDB() {
+        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        final boolean[] idMatched = {false};
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("ANDROID_ID", android_id);
+        data.put("Location", SplashScreen.countryLocation);
+        data.put("Date", new java.util.Date());
+
+        firestore.collection("Devices").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (android_id.equals(document.getData().get("ANDROID_ID").toString())) {
+                            idMatched[0] = true;
+                        }
+                    }
+                    if (!idMatched[0]) {
+                        firestore.collection("Devices").document(android_id).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                } else {
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+
+
+    }
 
     @Override
     protected void onStart() {

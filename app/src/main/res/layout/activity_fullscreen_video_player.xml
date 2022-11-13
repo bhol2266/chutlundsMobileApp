@@ -123,11 +123,11 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/recyclerViewLinearLayout"
+                android:id="@+id/recyclerViewLinearLayout_relatedVideos"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
 
                 <LinearLayout

@@ -1,12 +1,16 @@
 package com.bhola.chutlundsmobileapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -20,7 +24,16 @@ import java.util.List;
 
 public class ExoclickAds {
 
+
+    @SuppressLint("ClickableViewAccessibility")
     public static void loadAds(Context context) {
+        final Handler[] handler = new Handler[1];
+        final Runnable[] runnable = new Runnable[1];
+        final boolean[] adsSeen = {false};
+
+        if (SplashScreen.Ads_State.equals("inactive")) {
+            return;
+        }
 
         if (SplashScreen.adsLoaded == 0 || SplashScreen.adsLoaded == 2) {
             if (SplashScreen.adsLoaded == 0) SplashScreen.adsLoaded = 1;
@@ -49,10 +62,13 @@ public class ExoclickAds {
 
 
         webView = (WebView) promptView.findViewById(R.id.webview);
+
         closelayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                dialog[0].cancel();
+                if (adsSeen[0]) {
+                    if (dialog[0] != null) dialog[0].hide();
+                }
             }
         });
 
@@ -68,28 +84,27 @@ public class ExoclickAds {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-
-                Log.d("TAGA", "onPageFinished " + url);
-                Runnable runnable = new Runnable() {
+                if (adsSeen[0]) return;
+                runnable[0] = new Runnable() {
                     @Override
                     public void run() {
                         dialog[0].show();
                         new CountDownTimer(4000, 1000) {
                             public void onTick(long millisUntilFinished) {
-                                countDownText.setText("Ad will end in  " + millisUntilFinished / 1000 + " seconds");
+                                countDownText.setText("Ad will end in  " + (millisUntilFinished + 1000) / 1000 + " seconds");
                             }
 
                             public void onFinish() {
                                 SplashScreen.adsLoaded = 2;
-                                if (dialog[0] != null) dialog[0].hide();
-
+                                adsSeen[0] = true;
+                                countDownText.setText("Close Ad");
                             }
                         }.start();
                     }
                 };
                 try {
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.postDelayed(runnable, 2000);
+                    handler[0] = new Handler(Looper.getMainLooper());
+                    handler[0].postDelayed(runnable[0], 2000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

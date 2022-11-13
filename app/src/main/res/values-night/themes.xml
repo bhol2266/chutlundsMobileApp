@@ -35,27 +35,11 @@
         <item name="listPreferredItemPaddingRight">8dp</item>
     </style>
 
-    <style name="GridView_Title">
-        <item name="android:textSize">35dp</item>
-        <item name="android:fontFamily">@font/dancing</item>
-        <item name="android:textColor">#DF6969</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
-    </style>
-
     <style name="ThumbnailText">
         <item name="android:textSize">16dp</item>
         <item name="android:textColor">#BDBDBD</item>
     </style>
 
-
-    <style name="tabText">
-
-        <item name="android:textSize">20dp</item><!-- text size in menu-->
-        <item name="android:fontFamily">@font/robotoslab_regular</item><!-- text size in menu-->
-        <item name="android:background">@drawable/hooverffext</item><!-- text size in menu-->
-
-    </style>
 
     //Exoplayer
 
@@ -65,10 +49,6 @@
 
     <style name="ExoMediaButton.Next">
         <item name="android:visibility">gone</item>
-    </style>
-    <style name="ThemeOverlay.ChutlundsMobileApp.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
-        <item name="fullscreenTextColor">@color/light_blue_A400</item>
     </style>
 
 </resources>

@@ -90,7 +90,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     FrameLayout exoplayerFrameLayout;
     ImageView thumbnailImageView;
     ProgressBar videoProgressBar;
-    LinearLayout recyclerViewLinearLayout;
+    LinearLayout recyclerViewLinearLayout_relatedVideos;
     ProgressBar activityProgressBar;
     private String TAG = "TAGA";
     ExoPlayer exoplayer;
@@ -119,6 +119,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
         vidoetitle = getIntent().getStringExtra("title");
         href = getIntent().getStringExtra("href");
+//        href = "https://spankbang.com/74jbj/video/utro+safado+de+campinas+que+veio+trair+sua+mulher+comigo";  removedVideo sample
         thumbnail = getIntent().getStringExtra("thumbnail");
         thumbnailImageView = findViewById(R.id.thumbnailImageView);
         Picasso.with(FullscreenVideoPLayer.this).load(thumbnail).into(thumbnailImageView);
@@ -128,7 +129,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         linearLayoutStatusbar = findViewById(R.id.linearLayoutStatusbar);
         videoTitle = findViewById(R.id.title);
         exoplayerFrameLayout = findViewById(R.id.exoplayerFrameLayout);
-        recyclerViewLinearLayout = findViewById(R.id.recyclerViewLinearLayout);
+        recyclerViewLinearLayout_relatedVideos = findViewById(R.id.recyclerViewLinearLayout_relatedVideos);
         VideoSrc = getIntent().getStringExtra("videoSrc");
         videoTitle.setText(getIntent().getStringExtra("title"));
 
@@ -142,11 +143,9 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     private void prepare_videoPlayer() {
 
-        //This is because the videoDetailBar and relativelayout were not hiding inside recyclerViewLinearLayout, so hiding them indivisually
+        //This is because the videoDetailBar and relativelayout were not hiding inside recyclerViewLinearLayout_relatedVideos, so hiding them indivisually
         LinearLayout videoDetailBar = findViewById(R.id.videoDetailBar);
         videoDetailBar.setVisibility(View.VISIBLE);
-        TextView relativelayout = findViewById(R.id.relatedVideos);
-        relativelayout.setVisibility(View.VISIBLE);
         Button downloadBtn = findViewById(R.id.downloadBtn);
         downloadBtn.setVisibility(View.VISIBLE);
         downloadBtn.setOnClickListener(new View.OnClickListener() {
@@ -200,16 +199,14 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                 q.setFilterById(downloadId);
                 Cursor cursor = downloadManager.query(q);
                 cursor.moveToFirst();
-                int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                final long dl_progress = (bytes_downloaded*100L)/bytes_total;
-                Log.d(TAG, "bytes_total: "+bytes_total);
+//                int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+//                int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+//                final long dl_progress = (bytes_downloaded*100L)/bytes_total;
+                Toast.makeText(FullscreenVideoPLayer.this, "Downloading started...", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(FullscreenVideoPLayer.this, COLUMN_TOTAL_SIZE_BYTES, Toast.LENGTH_SHORT).show();
             }
         });
 
-        recyclerViewLinearLayout.setVisibility(View.VISIBLE);
         relatedVideosRecyclerView();
         TextView durationText = findViewById(R.id.duration);
         durationText.setText(duration);
@@ -327,19 +324,37 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 //let's parse json data
+                relatedVideos = new ArrayList<>();
+                video_qualities_available = new ArrayList<>();
+                video_qualities_available_withURL = new ArrayList<>();
+                screenshotsMap = new ArrayList<>();
+                tagsArray = new ArrayList<>();
+
                 try {
                     JSONObject jsonObject = new JSONObject(response);
+                    boolean noVideos = Boolean.parseBoolean(jsonObject.getString("noVideos"));
+                    if (noVideos) {
+                        JSONArray jsonArray = jsonObject.getJSONArray("relatedVideos");
+                        JSONArray jsonArray2 = jsonObject.getJSONArray("finalDataArray2");
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.getJSONObject(i);
+                            VideoModel videoModel = new VideoModel(obj.getString("thumbnailArray"), obj.getString("TitleArray"), obj.getString("durationArray"), obj.getString("likedPercentArray"), obj.getString("viewsArray"), obj.getString("previewVideoArray"), obj.getString("hrefArray"));
+                            relatedVideos.add(videoModel);
+                        }
+                        relatedVideosRecyclerView();
+                        exoplayerFrameLayout.setVisibility(View.GONE);
+                        Toast.makeText(FullscreenVideoPLayer.this, "This video has been removed", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     JSONObject videolink_qualities_screenshotsOBJECT = jsonObject.getJSONObject("videolink_qualities_screenshots");
                     VideoSrc = videolink_qualities_screenshotsOBJECT.getString("default_video_src");
                     JSONArray video_qualities_Array_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("video_qualities_available");
                     JSONArray video_qualitiesURL_Array_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("video_qualities_available_withURL");
                     JSONArray screenshotsArray_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("screenshotsArray");
                     JSONArray tagsArray_JSON = videolink_qualities_screenshotsOBJECT.getJSONArray("tagsArray");
-                    video_qualities_available = new ArrayList<>();
-                    video_qualities_available_withURL = new ArrayList<>();
-                    screenshotsMap = new ArrayList<>();
-                    relatedVideos = new ArrayList<>();
-                    tagsArray = new ArrayList<>();
+
 
                     for (int i = 0; i < video_qualities_Array_JSON.length(); i++) {
                         video_qualities_available.add(video_qualities_Array_JSON.getString(i));
@@ -496,7 +511,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     private void setVideoPlayerHeight_PORTRAIT(String orientation) {
         linearLayoutStatusbar.setVisibility(View.VISIBLE);
-        recyclerViewLinearLayout.setVisibility(View.VISIBLE);
+        recyclerViewLinearLayout_relatedVideos.setVisibility(View.VISIBLE);
 
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -518,7 +533,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     private void setVideoPlayerHeight_LANDSCAPE() {
         linearLayoutStatusbar.setVisibility(View.GONE);
-        recyclerViewLinearLayout.setVisibility(View.GONE);
+        recyclerViewLinearLayout_relatedVideos.setVisibility(View.GONE);
         ViewGroup.LayoutParams params = exoplayerFrameLayout.getLayoutParams();
         params.width = MATCH_PARENT;
         params.height = MATCH_PARENT;
@@ -641,6 +656,9 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
 
     private void relatedVideosRecyclerView() {
+        TextView relativelayoutTextview = findViewById(R.id.relatedVideos);
+        relativelayoutTextview.setVisibility(View.VISIBLE);
+        recyclerViewLinearLayout_relatedVideos.setVisibility(View.VISIBLE);
         LinearLayoutManager layoutManager = new GridLayoutManager(this, 1);
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);

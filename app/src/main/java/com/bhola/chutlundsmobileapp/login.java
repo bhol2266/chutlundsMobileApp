@@ -371,7 +371,7 @@ public class login extends AppCompatActivity {
     private void LoginInComplete() {
         finish();
 
-        if (getIntent().getStringExtra("commingFrom").equals("videoplayerActivity")) {
+        if (getIntent().getStringExtra("commingFrom") != null && getIntent().getStringExtra("commingFrom").equals("videoplayerActivity")) {
             Intent intent = new Intent(login.this, FullscreenVideoPLayer.class);
             intent.putExtra("title", getIntent().getStringExtra("title"));
             intent.putExtra("href", getIntent().getStringExtra("href"));

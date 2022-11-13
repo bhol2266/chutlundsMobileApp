@@ -18,8 +18,7 @@
         android:fontFamily="@font/dancing"
         android:text="Chutlunds.live"
         android:textColor="@color/light_black"
-        android:textSize="45dp"
-       />
+        android:textSize="45dp" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie"
@@ -52,12 +51,25 @@
             android:indeterminateTint="@color/light_black" />
 
         <TextView
+            android:id="@+id/loadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/robotoslab_regular"
             android:text="Loading videos..."
             android:textColor="@color/light_black"
             android:textSize="16dp" />
+
+        <Button
+            android:id="@+id/noInternet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:fontFamily="@font/robotoslab_regular"
+            android:text="Retry"
+            android:textColor="#ffffff"
+            android:textSize="16dp"
+            android:visibility="gone" />
+
 
     </LinearLayout>
 

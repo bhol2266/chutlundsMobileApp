@@ -27,7 +27,7 @@
             android:orientation="horizontal"
             android:paddingLeft="20dp"
             android:paddingTop="5dp"
-            android:paddingRight="10dp"
+            android:paddingRight="20dp"
             android:paddingBottom="5dp"
             android:visibility="visible">
 
@@ -37,15 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="Close Ad"
                 android:textColor="#ffffff" />
-
-            <ImageView
-                android:id="@+id/closeAd"
-                android:layout_width="23dp"
-                android:layout_height="23dp"
-                android:visibility="gone"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/close" />
+/>
 
         </LinearLayout>
 
