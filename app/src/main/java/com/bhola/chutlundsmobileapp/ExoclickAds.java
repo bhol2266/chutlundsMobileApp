@@ -87,8 +87,13 @@ public class ExoclickAds {
                         }.start();
                     }
                 };
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(runnable, 2000);
+                try {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(runnable, 2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 

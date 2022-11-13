@@ -82,15 +82,19 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     AlertDialog dialog;
     private ReviewManager reviewManager;
+    LinearLayout searchBar;
+    ImageView searchIcon;
+
 
     //Google login
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
-    public static  MenuItem menu_login;
+    public static MenuItem menu_login;
     public static TextView email;
     public static LinearLayout loggedInLayout;
     public static boolean userLoggedIn = false;
     public static String authProviderName = "";
+    public static String userEmail = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,8 +234,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void searchBar() {
-        ImageView searchIcon = findViewById(R.id.searchIcon);
-        LinearLayout searchBar = findViewById(R.id.searchBar);
+         searchIcon = findViewById(R.id.searchIcon);
+        searchBar = findViewById(R.id.searchBar);
         TextView goSearch = findViewById(R.id.goSearch);
         EditText searchKeyword = findViewById(R.id.searchKeyword);
 
@@ -257,6 +261,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Intent intent = new Intent(v.getContext(), VideosList.class);
                     intent.putExtra("Title", searchKeyword.getText().toString().trim());
+                    intent.putExtra("Search", "search");
+                    intent.putExtra("searchKeyword", searchKeyword.getText().toString().trim());
                     intent.putExtra("url", "https://spankbang.com/s/" + searchKeyword.getText().toString().trim() + "/");
                     startActivity(intent);
                 }
@@ -357,6 +363,8 @@ public class MainActivity extends AppCompatActivity {
 //                    searchKeyword.setText(tagText);
                     Intent intent = new Intent(v.getContext(), VideosList.class);
                     intent.putExtra("Title", tagText);
+                    intent.putExtra("Search", "search");
+                    intent.putExtra("searchKeyword", suggestedText.getText().toString().trim());
                     intent.putExtra("url", "https://spankbang.com/s/" + tagText + "/");
                     startActivity(intent);
                 }
@@ -488,6 +496,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void exit_dialog() {
+
+        if (searchBar.getVisibility() == View.VISIBLE) {
+            searchBar.setVisibility(View.GONE);
+            searchIcon.setImageResource(R.drawable.search);
+            return;
+        }
 
         NeumorphButton exit, exit2;
         final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(nav.getContext());
@@ -827,7 +841,7 @@ public class MainActivity extends AppCompatActivity {
                         menu_login.setTitle("Log In");
                         startActivity(getIntent());
                     }
-                    userLoggedIn=false;
+                    userLoggedIn = false;
 
 //                    String LoginWith = "google";
 //                    if (LoginWith.equals("google")) {
@@ -881,9 +895,9 @@ public class MainActivity extends AppCompatActivity {
             menu_login.setTitle("Log Out");
             loggedInLayout.setVisibility(View.VISIBLE);
             String personName = user.getDisplayName();
-            String personEmail = user.getEmail();
+            userEmail = user.getEmail();
 //            name.setText(personName);
-            email.setText(personEmail);
+            email.setText(userEmail);
         }
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);

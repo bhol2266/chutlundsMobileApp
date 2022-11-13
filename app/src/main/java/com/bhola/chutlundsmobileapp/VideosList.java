@@ -1,6 +1,7 @@
 package com.bhola.chutlundsmobileapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -36,7 +37,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +90,40 @@ public class VideosList extends AppCompatActivity {
         Log.d(TAG, "onCreate: " + SPANGBANG_URL_API + "?o=all");
         filteredObject = new ArrayList<>();
         videoListFilters();
+        addSearchKeyowrd_DB();
+    }
+
+    private void addSearchKeyowrd_DB() {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+
+        if (getIntent().getStringExtra("Search") != null && getIntent().getStringExtra("Search").equals("search") && MainActivity.userLoggedIn) {
+            firestore.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@androidx.annotation.NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        List<String> keywords = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            if (MainActivity.userEmail.equals(document.getData().get("email").toString())) {
+                                keywords = (List<String>) document.getData().get("keywords");
+                                Log.d(TAG, "onComplete: " + MainActivity.userEmail);
+                                Log.d(TAG, "onComplete: " + keywords);
+
+                                String searchKey = getIntent().getStringExtra("searchKeyword");
+                                Log.d(TAG, "searchKey: "+searchKey);
+                                if (!keywords.contains(searchKey)) {
+                                    keywords.add(searchKey);
+                                    firestore.collection("Users").document(MainActivity.userEmail).update("keywords", keywords);
+                                }
+
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                }
+            });
+        }
     }
 
     private void videoListFilters() {
