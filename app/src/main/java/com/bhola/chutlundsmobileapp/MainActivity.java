@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,8 +45,6 @@ import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -72,12 +71,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import soup.neumorphism.NeumorphButton;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "TAGA";
@@ -90,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
     private ReviewManager reviewManager;
     LinearLayout searchBar;
     ImageView searchIcon;
+    final Handler[] handler = new Handler[1]; //Ads
+
 
 
     //Google login
@@ -122,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadAds() {
-        ExoclickAds.loadAds(MainActivity.this);
+        final Runnable[] runnable = new Runnable[1];
+        ExoclickAds.loadAds(this,handler,runnable);
     }
 
     private void getUserLocaitonUsingIP() {
@@ -734,6 +733,43 @@ public class MainActivity extends AppCompatActivity {
                     textView.setText("Popular videos in " + SplashScreen.countryLocation + " " + flag);
                     TextView NavbarChutlundsTitle = findViewById(R.id.NavbarChutlundsTitle);
                     NavbarChutlundsTitle.setText("Chutlunds.live " + flag);
+                    NavbarChutlundsTitle.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            EditText passwordEdittext;
+                            Button passwordLoginBtn;
+
+
+                            AlertDialog dialog;
+
+                            final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(v.getContext());
+                            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+                            View promptView = inflater.inflate(R.layout.admin_panel_entry, null);
+                            builder.setView(promptView);
+                            builder.setCancelable(true);
+
+
+                            passwordEdittext = promptView.findViewById(R.id.passwordEdittext);
+                            passwordLoginBtn = promptView.findViewById(R.id.passwordLoginBtn);
+
+                            passwordLoginBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (passwordEdittext.getText().toString().equals("5555")) {
+                                        startActivity(new Intent(getApplicationContext(), admin_panel.class));
+
+                                    } else {
+                                        Toast.makeText(v.getContext(), "Enter Password", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+
+                            dialog = builder.create();
+                            dialog.show();
+                            return false;
+                        }
+                    });
 
 
                     RecyclerView recyclerView_Country = findViewById(R.id.recyclerView_Country);
@@ -913,6 +949,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+
     protected void onStart() {
         super.onStart();
 
@@ -933,6 +970,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "FirebaseUser: " + user);
         Log.d(TAG, "GoogleSignInAccount: " + acct);
 
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (handler[0] != null) handler[0].removeCallbacksAndMessages(null);
+        super.onWindowFocusChanged(hasFocus);
     }
 }
 
@@ -966,7 +1009,7 @@ class Adapter extends RecyclerView.Adapter<Adapter.viewholder> {
     public void onBindViewHolder(@NonNull viewholder holder, int position) {
         VideoModel item = videoData.get(position);
 
-        Picasso.with(context).load(item.getThumbnail()).into(holder.thumbnail);
+        Picasso.get().load(item.getThumbnail()).into(holder.thumbnail);
         holder.title.setText(item.getTitle());
         holder.duration.setText(item.getDuration());
         holder.views.setText(item.getViews());
@@ -1048,7 +1091,7 @@ class CategorySliderAdapter extends RecyclerView.Adapter<CategorySliderAdapter.v
         String url = collectionData.get(position).get("url");
         String title = collectionData.get(position).get("name").replace(".png", "").toUpperCase();
 
-        Picasso.with(context).load(url).into(holder.thumbnail);
+        Picasso.get().load(url).into(holder.thumbnail);
         holder.title.setText(title);
 
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {

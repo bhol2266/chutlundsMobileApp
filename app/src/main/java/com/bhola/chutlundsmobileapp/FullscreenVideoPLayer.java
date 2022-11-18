@@ -81,6 +81,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import soup.neumorphism.NeumorphButton;
 
@@ -104,9 +106,13 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     public static List<VideoModel> relatedVideos;
     public static List<String> tagsArray;
     boolean fullscreenActive = false;
+    boolean DATA_FETCHED = false;
     float videoAspectRatio;
     AlertDialog dialog;
     Spinner spinner;
+    boolean backPressed = false;
+    final Handler[] handler = new Handler[1];//Ads
+
 
     //Download Manager
     public final static String COLUMN_TOTAL_SIZE_BYTES = "total_size";
@@ -122,7 +128,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 //        href = "https://spankbang.com/74jbj/video/utro+safado+de+campinas+que+veio+trair+sua+mulher+comigo";  removedVideo sample
         thumbnail = getIntent().getStringExtra("thumbnail");
         thumbnailImageView = findViewById(R.id.thumbnailImageView);
-        Picasso.with(FullscreenVideoPLayer.this).load(thumbnail).into(thumbnailImageView);
+        Picasso.get().load(thumbnail).into(thumbnailImageView);
 
 
         videoProgressBar = findViewById(R.id.videoProgressBar);
@@ -132,7 +138,6 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         recyclerViewLinearLayout_relatedVideos = findViewById(R.id.recyclerViewLinearLayout_relatedVideos);
         VideoSrc = getIntent().getStringExtra("videoSrc");
         videoTitle.setText(getIntent().getStringExtra("title"));
-
 
         getVideoData_API();
         setVideoPlayerHeight_PORTRAIT("portrait");
@@ -176,34 +181,36 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                     snackbar.show();
                     return;
                 }
-
-                String downloadURL = video_qualities_available_withURL.get(spinner.getSelectedItemPosition());
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadURL));
-                String title = URLUtil.guessFileName(downloadURL, null, null);
-                request.setTitle((CharSequence) title);
+                try {
+                    String downloadURL = video_qualities_available_withURL.get(spinner.getSelectedItemPosition());
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadURL));
+                    String title = URLUtil.guessFileName(downloadURL, null, null);
+                    request.setTitle((CharSequence) title);
 //                request.setDescription("Downloading video please wait...");
-                request.setAllowedOverMetered(true);
-                request.setAllowedOverRoaming(true);
-                request.setVisibleInDownloadsUi(true);
-                String cookie = CookieManager.getInstance().getCookie(downloadURL);
-                request.addRequestHeader("cookie", cookie);
-                request.allowScanningByMediaScanner();
+                    request.setAllowedOverMetered(true);
+                    request.setAllowedOverRoaming(true);
+                    request.setVisibleInDownloadsUi(true);
+                    String cookie = CookieManager.getInstance().getCookie(downloadURL);
+                    request.addRequestHeader("cookie", cookie);
+                    request.allowScanningByMediaScanner();
 
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title);
 
-                DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                long downloadId = downloadManager.enqueue(request);
+                    DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                    long downloadId = downloadManager.enqueue(request);
 
-                DownloadManager.Query q = new DownloadManager.Query();
-                q.setFilterById(downloadId);
-                Cursor cursor = downloadManager.query(q);
-                cursor.moveToFirst();
+                    DownloadManager.Query q = new DownloadManager.Query();
+                    q.setFilterById(downloadId);
+                    Cursor cursor = downloadManager.query(q);
+                    cursor.moveToFirst();
 //                int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
 //                int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 //                final long dl_progress = (bytes_downloaded*100L)/bytes_total;
-                Toast.makeText(FullscreenVideoPLayer.this, "Downloading started...", Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(FullscreenVideoPLayer.this, "Downloading started...", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(FullscreenVideoPLayer.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -317,6 +324,75 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     }
 
+    private void exoplayerListeners() {
+        exoplayer.addListener(new Player.Listener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, int reason) {
+                Player.Listener.super.onTimelineChanged(timeline, reason);
+            }
+
+            @Override
+            public void onTracksChanged(Tracks tracks) {
+                Player.Listener.super.onTracksChanged(tracks);
+            }
+
+            @Override
+            public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
+                Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
+                Log.d(TAG, "onMediaMetadataChanged: " + mediaMetadata);
+            }
+
+            @Override
+            public void onIsLoadingChanged(boolean isLoading) {
+                Player.Listener.super.onIsLoadingChanged(isLoading);
+
+            }
+
+            @Override
+            public void onTrackSelectionParametersChanged(TrackSelectionParameters parameters) {
+                Player.Listener.super.onTrackSelectionParametersChanged(parameters);
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                if (playbackState == Player.STATE_BUFFERING) {
+//                    Log.d(TAG, "STATE_BUFFERING");
+                } else if (playbackState == Player.STATE_READY) {
+                    if (backPressed) {
+                        exoplayer.stop();
+                        exoplayer.release();
+                    }
+                }
+
+                Player.Listener.super.onPlaybackStateChanged(playbackState);
+//                Log.d(TAG, "playbackState: " + playbackState);
+            }
+
+            @Override
+            public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
+                Player.Listener.super.onPlayWhenReadyChanged(playWhenReady, reason);
+
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                Player.Listener.super.onIsPlayingChanged(isPlaying);
+                if (isPlaying && playerView.getVisibility() == View.GONE) {
+                    playerView.setVisibility(View.VISIBLE);
+                    videoProgressBar.setVisibility(View.GONE);
+                    thumbnailImageView.setVisibility(View.GONE);
+                }
+            }
+
+
+            @Override
+            public void onPlayerError(PlaybackException error) {
+                Player.Listener.super.onPlayerError(error);
+            }
+        });
+
+    }
+
 
     private void getVideoData_API() {
         RequestQueue requestQueue = Volley.newRequestQueue(FullscreenVideoPLayer.this);
@@ -329,6 +405,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                 video_qualities_available_withURL = new ArrayList<>();
                 screenshotsMap = new ArrayList<>();
                 tagsArray = new ArrayList<>();
+                DATA_FETCHED = true;
 
                 try {
                     JSONObject jsonObject = new JSONObject(response);
@@ -408,6 +485,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                DATA_FETCHED = true;
                 Log.d(TAG, "onErrorResponse: " + error);
             }
         }) {
@@ -540,72 +618,6 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         exoplayerFrameLayout.setLayoutParams(params);
     }
 
-    private void exoplayerListeners() {
-        exoplayer.addListener(new Player.Listener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, int reason) {
-                Player.Listener.super.onTimelineChanged(timeline, reason);
-            }
-
-            @Override
-            public void onTracksChanged(Tracks tracks) {
-                Player.Listener.super.onTracksChanged(tracks);
-            }
-
-            @Override
-            public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
-                Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
-                Log.d(TAG, "onMediaMetadataChanged: " + mediaMetadata);
-            }
-
-            @Override
-            public void onIsLoadingChanged(boolean isLoading) {
-                Player.Listener.super.onIsLoadingChanged(isLoading);
-
-            }
-
-            @Override
-            public void onTrackSelectionParametersChanged(TrackSelectionParameters parameters) {
-                Player.Listener.super.onTrackSelectionParametersChanged(parameters);
-            }
-
-            @Override
-            public void onPlaybackStateChanged(int playbackState) {
-                if (playbackState == Player.STATE_BUFFERING) {
-//                    Log.d(TAG, "STATE_BUFFERING");
-                } else if (playbackState == Player.STATE_READY) {
-//                    Log.d(TAG, "STATE_READY");
-
-                }
-                Player.Listener.super.onPlaybackStateChanged(playbackState);
-//                Log.d(TAG, "playbackState: " + playbackState);
-            }
-
-            @Override
-            public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
-                Player.Listener.super.onPlayWhenReadyChanged(playWhenReady, reason);
-
-            }
-
-            @Override
-            public void onIsPlayingChanged(boolean isPlaying) {
-                Player.Listener.super.onIsPlayingChanged(isPlaying);
-                if (isPlaying && playerView.getVisibility() == View.GONE) {
-                    playerView.setVisibility(View.VISIBLE);
-                    videoProgressBar.setVisibility(View.GONE);
-                    thumbnailImageView.setVisibility(View.GONE);
-                }
-            }
-
-
-            @Override
-            public void onPlayerError(PlaybackException error) {
-                Player.Listener.super.onPlayerError(error);
-            }
-        });
-
-    }
-
 
     private void videoQuality_dialog() {
 
@@ -676,29 +688,16 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         }
     }
 
+
     @Override
-    public void onBackPressed() {
-
-        if (fullscreenActive) {
-            fullscreenActive = false;
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
-            windowInsetsCompat.show(WindowInsetsCompat.Type.statusBars());
-            setVideoPlayerHeight_PORTRAIT("landscape");
-        } else {
-            if (exoplayer != null) {
-                exoplayer.pause();
-                exoplayer.stop();
-                exoplayer.clearMediaItems();
-                super.onBackPressed();
-            }
-
-        }
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (handler[0] != null) handler[0].removeCallbacksAndMessages(null);
+        super.onWindowFocusChanged(hasFocus);
     }
 
     private void loadAds() {
-        ExoclickAds.loadAds(FullscreenVideoPLayer.this);
+        final Runnable[] runnable = new Runnable[1];
+        ExoclickAds.loadAds(this, handler, runnable);
     }
 
     @Override
@@ -717,7 +716,33 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         }
 
     }
+
+
+    @Override
+    public void onBackPressed() {
+
+        if (fullscreenActive && DATA_FETCHED) {
+            fullscreenActive = false;
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            WindowInsetsControllerCompat windowInsetsCompat = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+            windowInsetsCompat.show(WindowInsetsCompat.Type.statusBars());
+            setVideoPlayerHeight_PORTRAIT("landscape");
+        } else {
+            if (handler[0] != null) handler[0].removeCallbacksAndMessages(null);
+            if (exoplayer != null) {
+                exoplayer.pause();
+                exoplayer.stop();
+                exoplayer.clearMediaItems();
+            }
+            backPressed=true;
+            super.onBackPressed();
+            this.finish();
+        }
+    }
+
 }
+
 
 class ScreenShotModel {
 

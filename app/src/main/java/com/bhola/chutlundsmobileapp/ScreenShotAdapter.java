@@ -48,7 +48,7 @@ class ScreenShotAdapter extends RecyclerView.Adapter<ScreenShotAdapter.viewholde
     public void onBindViewHolder(@NonNull viewholder holder, int position) {
         ScreenShotModel screenShotModel = screenShotCollection.get(position);
 
-        Picasso.with(context).load(screenShotModel.getUrl()).into(holder.screenShotthumbnail);
+        Picasso.get().load(screenShotModel.getUrl()).into(holder.screenShotthumbnail);
         holder.seekTime.setText(screenShotModel.getSeekTime());
 
 

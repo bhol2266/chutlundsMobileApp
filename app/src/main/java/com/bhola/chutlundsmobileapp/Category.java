@@ -135,7 +135,7 @@ class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.viewholder> {
         String url = collectionData.get(position).get("url");
         String title = collectionData.get(position).get("name").replace(".png", "").toUpperCase();
 
-        Picasso.with(context).load(url).into(holder.thumbnail);
+        Picasso.get().load(url).into(holder.thumbnail);
         holder.title.setText(title);
 
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {

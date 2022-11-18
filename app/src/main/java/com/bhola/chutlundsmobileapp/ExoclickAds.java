@@ -2,15 +2,12 @@ package com.bhola.chutlundsmobileapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -20,15 +17,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
-import java.util.List;
-
 public class ExoclickAds {
 
-
     @SuppressLint("ClickableViewAccessibility")
-    public static void loadAds(Context context) {
-        final Handler[] handler = new Handler[1];
-        final Runnable[] runnable = new Runnable[1];
+    public static void loadAds(Context context, Handler[] handler, Runnable[] runnable) {
+
         final boolean[] adsSeen = {false};
 
         if (SplashScreen.Ads_State.equals("inactive")) {
@@ -57,7 +50,7 @@ public class ExoclickAds {
         closelayout = promptView.findViewById(R.id.closelayout);
         countDownText = promptView.findViewById(R.id.countDownText);
         builder.setView(promptView);
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         dialog[0] = builder.create();
 
 
@@ -114,6 +107,9 @@ public class ExoclickAds {
 
 
     }
+
+
+
 
 
 }

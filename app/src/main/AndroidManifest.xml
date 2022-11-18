@@ -44,6 +44,13 @@
                 android:value="" />
         </activity>
         <activity
+            android:name=".admin_panel"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".FullscreenVideoPLayer"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false">

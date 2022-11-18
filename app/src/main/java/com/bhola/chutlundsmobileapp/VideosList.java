@@ -1,18 +1,9 @@
 package com.bhola.chutlundsmobileapp;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,9 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -43,7 +32,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,8 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import soup.neumorphism.NeumorphButton;
 
 public class VideosList extends AppCompatActivity {
 
@@ -69,6 +55,7 @@ public class VideosList extends AppCompatActivity {
     NestedScrollView nestedScrollView;
     LinearLayout notFoundMessageLayout;
     Button notFoundGoback;
+    final Handler[] handler = new Handler[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -546,9 +533,23 @@ public class VideosList extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (handler[0] != null) handler[0].removeCallbacksAndMessages(null);
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (handler[0] != null) handler[0].removeCallbacksAndMessages(null);
+        super.onWindowFocusChanged(hasFocus);
+    }
 
     private void loadAds() {
-        ExoclickAds.loadAds(VideosList.this);
+        final Runnable[] runnable = new Runnable[1];
+        ExoclickAds.loadAds(this,handler,runnable);
+
     }
+
 
 }

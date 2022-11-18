@@ -40,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 public class login extends AppCompatActivity {
@@ -475,7 +476,7 @@ public class login extends AppCompatActivity {
     }
 
     private void saveUserdataFireStore(String displayName, String email, String countryLocation, boolean verified, boolean membership, ArrayList<String> keyword) {
-        firebaseFirestore.collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getEmail()).set(new UserModel(displayName, email, SplashScreen.countryLocation, verified, membership, keyword)).addOnSuccessListener(new OnSuccessListener<Void>() {
+        firebaseFirestore.collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getEmail()).set(new UserModel(displayName, email, SplashScreen.countryLocation, verified, membership, keyword,new java.util.Date())).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
             }
@@ -494,17 +495,19 @@ class UserModel {
     String fullname, email, country;
     boolean verified, membership;
     ArrayList<String> keywords;
+    Date date;
 
     public UserModel() {
     }
 
-    public UserModel(String fullname, String email, String country, boolean verified, boolean membership, ArrayList<String> keywords) {
+    public UserModel(String fullname, String email, String country, boolean verified, boolean membership, ArrayList<String> keywords, Date date) {
         this.fullname = fullname;
         this.email = email;
         this.country = country;
         this.verified = verified;
         this.membership = membership;
         this.keywords = keywords;
+        this.date = date;
     }
 
     public String getFullname() {
@@ -553,5 +556,13 @@ class UserModel {
 
     public void setKeywords(ArrayList<String> keywords) {
         this.keywords = keywords;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }
