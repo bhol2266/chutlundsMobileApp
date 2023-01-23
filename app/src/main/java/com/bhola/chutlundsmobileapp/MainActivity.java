@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -71,6 +72,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             SplashScreen.countryLocation = jsonObject.getString("countryName");
                             SplashScreen.countryCode = jsonObject.getString("countryCode");
-                            showLocationVideos();
+//                            showLocationVideos();
                             installsDB(); // record device id in firestore using android id
 
                         } catch (JSONException e) {
@@ -159,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         for (int j = 0; j < jsonArrayyy.length(); j++) {
             JSONObject obj = (JSONObject) jsonArrayyy.get(j);
             if (obj.getString("CountryName").toString().toLowerCase().trim().equals(SplashScreen.countryLocation.trim().toLowerCase())) {
-                getVideoData_API("https://spankbang.com/s/" + obj.getString("language").trim().toLowerCase() + "/?o=all");
+                getVideoData_API("https://spankbang.com/s/" + obj.getString("language").trim().toLowerCase() + "/?o=all&p=m");
             }
         }
 
@@ -386,13 +388,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void trendingVideos() {
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-//        LinearLayoutManager layoutManager = new GridLayoutManager(this, 1);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new GridLayoutManager(this, 2);
         RecyclerView recyclerView = findViewById(R.id.recyclerView_Trending);
 
         recyclerView.setLayoutManager(layoutManager);
         Adapter adapter = new Adapter(MainActivity.this, SplashScreen.Trending_collectonData);
         recyclerView.setAdapter(adapter);
+        recyclerView.setNestedScrollingEnabled(false);
+
         adapter.notifyDataSetChanged();
 
 
@@ -411,12 +415,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void upcomingVideos() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new GridLayoutManager(this, 2);
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView_Upcoming);
 
         recyclerView.setLayoutManager(layoutManager);
         Adapter adapter = new Adapter(MainActivity.this, SplashScreen.Upcoming_collectonData);
         recyclerView.setAdapter(adapter);
+        recyclerView.setNestedScrollingEnabled(false);
+
         adapter.notifyDataSetChanged();
 
         LinearLayout trendingVideos = findViewById(R.id.upcomingVideos);
@@ -433,12 +441,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void popularVideos() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new GridLayoutManager(this, 2);
         RecyclerView recyclerView = findViewById(R.id.recyclerView_Popular);
 
         recyclerView.setLayoutManager(layoutManager);
         Adapter adapter = new Adapter(MainActivity.this, SplashScreen.Popular_collectonData);
         recyclerView.setAdapter(adapter);
+        recyclerView.setNestedScrollingEnabled(false);
+
         adapter.notifyDataSetChanged();
 
         LinearLayout trendingVideos = findViewById(R.id.popularVideos);
@@ -455,12 +465,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void newVideos() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new GridLayoutManager(this, 2);
         RecyclerView recyclerView = findViewById(R.id.recyclerView_New);
 
         recyclerView.setLayoutManager(layoutManager);
         Adapter adapter = new Adapter(MainActivity.this, SplashScreen.New_collectonData);
         recyclerView.setAdapter(adapter);
+        recyclerView.setNestedScrollingEnabled(false);
+
         adapter.notifyDataSetChanged();
 
         LinearLayout trendingVideos = findViewById(R.id.newVideos);
@@ -718,7 +730,6 @@ public class MainActivity extends AppCompatActivity {
                         collectonData.add(videoModel);
                     }
 
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false);
                     TextView textView = findViewById(R.id.countryNameTextviews);
                     int flagOffset = 0x1F1E6;
                     int asciiOffset = 0x41;
@@ -785,10 +796,12 @@ public class MainActivity extends AppCompatActivity {
                     });
                     LinearLayout countryVideo = findViewById(R.id.countryVideo);
                     countryVideo.setVisibility(View.VISIBLE);
+                    Collections.shuffle(collectonData);
                     Adapter adapter = new Adapter(MainActivity.this, collectonData);
-                    recyclerView_Country.setLayoutManager(layoutManager);
+                    LinearLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+                    recyclerView_Country.setLayoutManager(gridLayoutManager);
+                    recyclerView_Country.setNestedScrollingEnabled(false);
                     recyclerView_Country.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
 
 //                    startActivity(new Intent(MainActivity.this,AdsterraAds.class));
 
