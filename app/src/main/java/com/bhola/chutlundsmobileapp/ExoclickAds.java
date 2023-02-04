@@ -41,7 +41,7 @@ public class ExoclickAds {
 
         String url = "https://passablejeepparliament.com/pvpcafc4kk?key=f25a9b13a509037a68a314ca0278f644";
         String url2 = "https://passablejeepparliament.com/uvm4sgmd?key=1a4c3d6da7024a80c0acf420460a907f";
-        final String[] url3 = {"https://www.chutlunds.live/ads/ads.html"};
+        final String[] url3 = {"https://www.chutlunds.com/ads/ads.html"};
 
 
         final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);

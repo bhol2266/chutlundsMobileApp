@@ -335,7 +335,7 @@ public class VideosList extends AppCompatActivity {
         List<VideoModel> collectonData = new ArrayList<>();
         List<String> pageData = new ArrayList<>();
         RequestQueue requestQueue = Volley.newRequestQueue(VideosList.this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.live/api/spangbang/getvideos", new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.com/api/spangbang/getvideos", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //let's parse json data

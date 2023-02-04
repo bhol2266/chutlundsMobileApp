@@ -55,7 +55,7 @@
                     android:layout_toEndOf="@+id/openDrawer"
                     android:layout_toRightOf="@id/openDrawer"
                     android:fontFamily="@font/dancing"
-                    android:text="Chutlunds.live"
+                    android:text="Chutlunds.com"
                     android:textColor="@color/black"
                     android:textSize="28dp" />
 

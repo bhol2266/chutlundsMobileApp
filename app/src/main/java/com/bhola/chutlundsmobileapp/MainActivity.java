@@ -645,7 +645,7 @@ public class MainActivity extends AppCompatActivity {
 
                         try {
                             Intent i5 = new Intent(Intent.ACTION_VIEW);
-                            i5.setData(Uri.parse("https://www.chutlunds.live/privacy"));
+                            i5.setData(Uri.parse("https://www.chutlunds.com/privacy"));
                             startActivity(i5);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -672,7 +672,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.Terms_and_Condition:
                         try {
                             Intent i5 = new Intent(Intent.ACTION_VIEW);
-                            i5.setData(Uri.parse("https://www.chutlunds.live/terms"));
+                            i5.setData(Uri.parse("https://www.chutlunds.com/terms"));
                             startActivity(i5);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -715,7 +715,7 @@ public class MainActivity extends AppCompatActivity {
         List<VideoModel> collectonData = new ArrayList<>();
         List<String> pageData = new ArrayList<>();
         RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.live/api/spangbang/getvideos", new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.com/api/spangbang/getvideos", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //let's parse json data
@@ -743,7 +743,7 @@ public class MainActivity extends AppCompatActivity {
                             + new String(Character.toChars(secondChar));
                     textView.setText("Popular videos in " + SplashScreen.countryLocation + " " + flag);
                     TextView NavbarChutlundsTitle = findViewById(R.id.NavbarChutlundsTitle);
-                    NavbarChutlundsTitle.setText("Chutlunds.live " + flag);
+                    NavbarChutlundsTitle.setText("Chutlunds.com " + flag);
                     NavbarChutlundsTitle.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {

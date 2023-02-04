@@ -87,7 +87,7 @@ public class API_CONFIG {
 
 //    private void getAPI_DATA() {
 //        try {
-//            String API_URL = "https://www.chutlunds.live/api/spangbang/getvideos";
+//            String API_URL = "https://www.chutlunds.com/api/spangbang/getvideos";
 //            String url = "https://spankbang.com/s/boobs";
 //            JSONObject jsonBody = new JSONObject();
 //            jsonBody.put("url", url);

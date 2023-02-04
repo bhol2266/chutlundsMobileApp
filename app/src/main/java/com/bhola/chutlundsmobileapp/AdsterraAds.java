@@ -24,7 +24,7 @@ public class AdsterraAds extends AppCompatActivity {
 
         String url = "https://passablejeepparliament.com/pvpcafc4kk?key=f25a9b13a509037a68a314ca0278f644";
         String url2 = "https://passablejeepparliament.com/uvm4sgmd?key=1a4c3d6da7024a80c0acf420460a907f";
-        String url3 = "https://www.chutlunds.live/ads/ads.html";
+        String url3 = "https://www.chutlunds.com/ads/ads.html";
 
         webView = (WebView) findViewById(R.id.webview);
         closelayout = findViewById(R.id.closelayout);

@@ -16,7 +16,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="150dp"
         android:fontFamily="@font/dancing"
-        android:text="Chutlunds.live"
+        android:text="Chutlunds.com"
         android:textColor="@color/light_black"
         android:textSize="45dp" />
 

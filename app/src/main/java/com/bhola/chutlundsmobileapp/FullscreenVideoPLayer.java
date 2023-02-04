@@ -396,7 +396,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
 
     private void getVideoData_API() {
         RequestQueue requestQueue = Volley.newRequestQueue(FullscreenVideoPLayer.this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.live/api/spangbang/videoPlayer", new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://www.chutlunds.com/api/spangbang/videoPlayer", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //let's parse json data

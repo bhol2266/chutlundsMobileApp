@@ -155,7 +155,7 @@ public class SplashScreen extends AppCompatActivity {
 
         if (isInternetAvailable(SplashScreen.this)) {
             internetAvailable = true;
-            String API_URL = "https://www.chutlunds.live/api/spangbang/homepage";
+            String API_URL = "https://www.chutlunds.com/api/spangbang/homepage";
             HomepageVideoAPI(API_URL, this);
         } else {
             internetAvailable = false;
