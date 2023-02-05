@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             SplashScreen.countryLocation = jsonObject.getString("countryName");
                             SplashScreen.countryCode = jsonObject.getString("countryCode");
-//                            showLocationVideos();
+                            showLocationVideos();
                             installsDB(); // record device id in firestore using android id
 
                         } catch (JSONException e) {
@@ -742,14 +742,14 @@ public class MainActivity extends AppCompatActivity {
                     String flag = new String(Character.toChars(firstChar))
                             + new String(Character.toChars(secondChar));
                     textView.setText("Popular videos in " + SplashScreen.countryLocation + " " + flag);
-                    TextView NavbarChutlundsTitle = findViewById(R.id.NavbarChutlundsTitle);
-                    NavbarChutlundsTitle.setText("Chutlunds.com " + flag);
-                    NavbarChutlundsTitle.setOnLongClickListener(new View.OnLongClickListener() {
+                    TextView NavbarChutlunds = findViewById(R.id.NavbarChutlunds);
+                    NavbarChutlunds.setText("Chutlunds.comm " + flag);
+
+                    NavbarChutlunds.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
                             EditText passwordEdittext;
                             Button passwordLoginBtn;
-
 
                             AlertDialog dialog;
 
