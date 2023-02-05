@@ -11,8 +11,8 @@ android {
         applicationId "com.bhola.chutlundsmobileapp"
         minSdk 21
         targetSdk 32
-        versionCode 9
-        versionName "9.0"
+        versionCode 10
+        versionName "10.0"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
