@@ -119,6 +119,49 @@ public class MainActivity extends AppCompatActivity {
         getUserLocaitonUsingIP();
         checkLogin();
         loadAds();
+        gotoAdminpanel();
+    }
+
+    private void gotoAdminpanel() {
+        TextView NavbarChutlunds = findViewById(R.id.NavbarChutlunds);
+
+        NavbarChutlunds.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                EditText passwordEdittext;
+                Button passwordLoginBtn;
+
+                AlertDialog dialog;
+
+                final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(v.getContext());
+                LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+                View promptView = inflater.inflate(R.layout.admin_panel_entry, null);
+                builder.setView(promptView);
+                builder.setCancelable(true);
+
+
+                passwordEdittext = promptView.findViewById(R.id.passwordEdittext);
+                passwordLoginBtn = promptView.findViewById(R.id.passwordLoginBtn);
+
+                passwordLoginBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (passwordEdittext.getText().toString().equals("5555")) {
+                            startActivity(new Intent(getApplicationContext(), admin_panel.class));
+
+                        } else {
+                            Toast.makeText(v.getContext(), "Enter Password", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+                dialog = builder.create();
+                dialog.show();
+                return false;
+            }
+        });
+
     }
 
     private void loadAds() {
@@ -137,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             SplashScreen.countryLocation = jsonObject.getString("countryName");
                             SplashScreen.countryCode = jsonObject.getString("countryCode");
-                            showLocationVideos();
+//                            showLocationVideos();
                             installsDB(); // record device id in firestore using android id
 
                         } catch (JSONException e) {
@@ -744,43 +787,6 @@ public class MainActivity extends AppCompatActivity {
                     textView.setText("Popular videos in " + SplashScreen.countryLocation + " " + flag);
                     TextView NavbarChutlunds = findViewById(R.id.NavbarChutlunds);
                     NavbarChutlunds.setText("Chutlunds.comm " + flag);
-
-                    NavbarChutlunds.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            EditText passwordEdittext;
-                            Button passwordLoginBtn;
-
-                            AlertDialog dialog;
-
-                            final androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(v.getContext());
-                            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
-                            View promptView = inflater.inflate(R.layout.admin_panel_entry, null);
-                            builder.setView(promptView);
-                            builder.setCancelable(true);
-
-
-                            passwordEdittext = promptView.findViewById(R.id.passwordEdittext);
-                            passwordLoginBtn = promptView.findViewById(R.id.passwordLoginBtn);
-
-                            passwordLoginBtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (passwordEdittext.getText().toString().equals("5555")) {
-                                        startActivity(new Intent(getApplicationContext(), admin_panel.class));
-
-                                    } else {
-                                        Toast.makeText(v.getContext(), "Enter Password", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
-
-                            dialog = builder.create();
-                            dialog.show();
-                            return false;
-                        }
-                    });
 
 
                     RecyclerView recyclerView_Country = findViewById(R.id.recyclerView_Country);
