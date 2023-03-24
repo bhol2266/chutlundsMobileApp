@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.multidex.BuildConfig;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -211,7 +214,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkForAppUpdate() {
-        if (SplashScreen.Firebase_Version_Code != BuildConfig.VERSION_CODE) {
+
+        int VersionCode  = 0;
+        try {
+            PackageInfo  pInfo = MainActivity.this.getPackageManager().getPackageInfo(MainActivity.this.getPackageName(), PackageManager.GET_META_DATA);
+            VersionCode=pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (SplashScreen.Firebase_Version_Code != VersionCode) {
 
             Button updateBtn;
             TextView yourVersion, latestVersion;
