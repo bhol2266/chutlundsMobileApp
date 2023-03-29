@@ -72,7 +72,10 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
+import com.startapp.sdk.adsbase.Ad;
 import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.VideoListener;
+import com.startapp.sdk.adsbase.adlisteners.AdEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -88,6 +91,7 @@ import java.util.concurrent.Executors;
 import soup.neumorphism.NeumorphButton;
 
 public class FullscreenVideoPLayer extends AppCompatActivity {
+    
     TextView videoTitle;
     LinearLayout linearLayoutStatusbar;
     FrameLayout exoplayerFrameLayout;
@@ -157,31 +161,36 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         downloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!MainActivity.userLoggedIn) {
-                    final Snackbar snackbar = Snackbar.make(v, "", Snackbar.LENGTH_LONG);
-                    View customSnackView = getLayoutInflater().inflate(R.layout.custom_snackbar_view, null);
-                    // now change the layout of the snackbar
-                    Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+//                if (!MainActivity.userLoggedIn) {
+//                    final Snackbar snackbar = Snackbar.make(v, "", Snackbar.LENGTH_LONG);
+//                    View customSnackView = getLayoutInflater().inflate(R.layout.custom_snackbar_view, null);
+//                    // now change the layout of the snackbar
+//                    Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
+//
+//                    TextView gotologins = customSnackView.findViewById(R.id.gotologins);
+//                    gotologins.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//
+//                            Intent i = new Intent(FullscreenVideoPLayer.this, login.class);
+//                            i.putExtra("commingFrom", "videoplayerActivity");
+//                            i.putExtra("title", vidoetitle);
+//                            i.putExtra("href", href);
+//                            i.putExtra("thumbnail", thumbnail);
+//                            startActivity(i);
+//                        }
+//                    });
+//
+//                    // add the custom snack bar layout to snackbar layout
+//                    snackbarLayout.addView(customSnackView, 0);
+//                    snackbar.show();
+//                    return;
+//                }
+                Toast.makeText(FullscreenVideoPLayer.this, "Download will start after Ad ", Toast.LENGTH_LONG).show();
+                    showRewardedVideo();
+            }
 
-                    TextView gotologins = customSnackView.findViewById(R.id.gotologins);
-                    gotologins.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent i = new Intent(FullscreenVideoPLayer.this, login.class);
-                            i.putExtra("commingFrom", "videoplayerActivity");
-                            i.putExtra("title", vidoetitle);
-                            i.putExtra("href", href);
-                            i.putExtra("thumbnail", thumbnail);
-                            startActivity(i);
-                        }
-                    });
-
-                    // add the custom snack bar layout to snackbar layout
-                    snackbarLayout.addView(customSnackView, 0);
-                    snackbar.show();
-                    return;
-                }
+            private void downloadVideoAfterWatchingAd() {
                 try {
                     String downloadURL = video_qualities_available_withURL.get(spinner.getSelectedItemPosition());
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downloadURL));
@@ -212,7 +221,32 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                 } catch (Exception e) {
                     Toast.makeText(FullscreenVideoPLayer.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+
             }
+
+            private void showRewardedVideo() {
+                final StartAppAd rewardedVideo = new StartAppAd(FullscreenVideoPLayer.this);
+
+                rewardedVideo.setVideoListener(new VideoListener() {
+                    @Override
+                    public void onVideoCompleted() {
+                        downloadVideoAfterWatchingAd();
+                    }
+                });
+
+                rewardedVideo.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, new AdEventListener() {
+                    @Override
+                    public void onReceiveAd(Ad ad) {
+                        rewardedVideo.showAd();
+                    }
+
+                    @Override
+                    public void onFailedToReceiveAd(Ad ad) {
+                        Toast.makeText(getApplicationContext(), "Can't show rewarded video", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
         });
 
         relatedVideosRecyclerView();
@@ -697,7 +731,12 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
     }
 
     private void showAds() {
-        StartAppAd.showAd(FullscreenVideoPLayer.this);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                StartAppAd.showAd(FullscreenVideoPLayer.this);
+            }
+        },50000);
     }
 
     @Override

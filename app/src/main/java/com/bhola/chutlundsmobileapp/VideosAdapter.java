@@ -1,26 +1,23 @@
 package com.bhola.chutlundsmobileapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -30,18 +27,21 @@ import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.Tracks;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.trackselection.TrackSelectionParameters;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.nativead.NativeAd;
 import com.squareup.picasso.Picasso;
+import com.startapp.sdk.ads.nativead.NativeAdPreferences;
+import com.startapp.sdk.ads.nativead.StartAppNativeAd;
+import com.startapp.sdk.adsbase.Ad;
+import com.startapp.sdk.adsbase.adlisteners.AdEventListener;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.viewholder> {
@@ -102,8 +102,60 @@ class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.viewholder> {
             }
         });
 
+        loadNativeAds(holder.native_Icon, holder.native_Button, holder.native_Title, holder.native_Description, holder.NativeAdCardview, holder.getAbsoluteAdapterPosition());
 
     }
+
+    private void loadNativeAds(ImageView native_Icon, Button native_Button, TextView native_Title, TextView native_Description, CardView nativeAdCardview, int absoluteAdapterPosition) {
+
+        if (absoluteAdapterPosition % SplashScreen.Native_Ad_Interval == 0) {
+            final StartAppNativeAd nativeAd = new StartAppNativeAd(context);
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            service.execute(new Runnable() {
+                @Override
+                public void run() {
+                    nativeAd.loadAd(new NativeAdPreferences()
+                            .setAdsNumber(1)
+                            .setAutoBitmapDownload(true)
+                            .setPrimaryImageSize(2), new AdEventListener() {
+                        @Override
+                        public void onReceiveAd(Ad ad) {
+
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    native_Icon.setImageBitmap(nativeAd.getNativeAds().get(0).getImageBitmap());
+                                    native_Title.setText(nativeAd.getNativeAds().get(0).getTitle());
+                                    native_Description.setText(nativeAd.getNativeAds().get(0).getDescription());
+                                    native_Button.setText(nativeAd.getNativeAds().get(0).isApp() ? "Install" : "Open");
+                                    native_Button.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            nativeAdCardview.performClick();
+                                        }
+                                    });
+                                    nativeAd.getNativeAds().get(0).registerViewForInteraction(nativeAdCardview);
+
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onFailedToReceiveAd(Ad ad) {
+                            if (BuildConfig.DEBUG) {
+                                Log.v(SplashScreen.TAG, "onFailedToReceiveAd: " + ad.getErrorMessage());
+                            }
+                        }
+                    });
+                }
+            });
+
+        } else {
+            nativeAdCardview.setVisibility(View.GONE);
+        }
+    }
+
 
     private void videoDialog(String previewVideo, String thumbnail) {
 
@@ -267,6 +319,12 @@ class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.viewholder> {
         FrameLayout framelayout;
         ProgressBar progressbar;
 
+        ImageView native_Icon;
+        TextView native_Title;
+        TextView native_Description;
+        Button native_Button;
+        CardView NativeAdCardview;
+
         public viewholder(@NonNull View itemView) {
             super(itemView);
 
@@ -278,6 +336,13 @@ class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.viewholder> {
             previewBtn = itemView.findViewById(R.id.previewBtn);
             framelayout = itemView.findViewById(R.id.framelayout);
             progressbar = itemView.findViewById(R.id.progressbar);
+
+
+            native_Icon = itemView.findViewById(R.id.icon);
+            native_Title = itemView.findViewById(R.id.title);
+            native_Description = itemView.findViewById(R.id.description);
+            native_Button = itemView.findViewById(R.id.button);
+            NativeAdCardview = itemView.findViewById(R.id.NativeAdCardview);
 
         }
 

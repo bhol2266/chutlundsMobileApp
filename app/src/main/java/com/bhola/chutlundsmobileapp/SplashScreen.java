@@ -81,7 +81,7 @@ import java.util.concurrent.Executors;
 
 public class SplashScreen extends AppCompatActivity {
 
-    private static final String TAG = "TAGA";
+    public static final String TAG = "TAGA";
     Animation topAnim, bottomAnim;
     ImageView image;
     TextView textView;
@@ -110,6 +110,7 @@ public class SplashScreen extends AppCompatActivity {
     private FirebaseAnalytics mFirebaseAnalytics;
 
     public static int adsLoaded = 1; //0,2=dont load   1= load
+    public static int Native_Ad_Interval = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +120,8 @@ public class SplashScreen extends AppCompatActivity {
 
         //Start App
         StartAppAd.disableSplash();
-        StartAppSDK.setTestAdsEnabled(BuildConfig.DEBUG);
+//        StartAppSDK.setTestAdsEnabled(BuildConfig.DEBUG);
+        StartAppSDK.init(this, getString(R.string.StartAds_APPID), true);
 
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
