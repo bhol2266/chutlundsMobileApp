@@ -100,7 +100,12 @@
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
+        <com.startapp.sdk.ads.banner.Banner
+            android:id="@+id/startAppBanner"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
 
         <LinearLayout
             android:layout_width="match_parent"

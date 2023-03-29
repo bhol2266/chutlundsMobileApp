@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.startapp.sdk.adsbase.StartAppAd;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -331,7 +332,6 @@ public class VideosList extends AppCompatActivity {
 
 
     private void getVideoData_API(String bodyURL) {
-        loadAds();
         List<VideoModel> collectonData = new ArrayList<>();
         List<String> pageData = new ArrayList<>();
         RequestQueue requestQueue = Volley.newRequestQueue(VideosList.this);
@@ -545,9 +545,8 @@ public class VideosList extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
     }
 
-    private void loadAds() {
-        final Runnable[] runnable = new Runnable[1];
-        ExoclickAds.loadAds(this,handler,runnable);
+    private void showAds() {
+        StartAppAd.showAd(VideosList.this);
 
     }
 

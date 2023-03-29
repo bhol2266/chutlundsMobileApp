@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.multidex.BuildConfig;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.android.volley.AuthFailureError;
@@ -62,6 +63,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
+import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.StartAppSDK;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -113,6 +116,12 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         fullscreenMode();
         setContentView(R.layout.splash_screen);
+
+        //Start App
+        StartAppAd.disableSplash();
+        StartAppSDK.setTestAdsEnabled(BuildConfig.DEBUG);
+
+
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         allUrl();
 //        readJSON();

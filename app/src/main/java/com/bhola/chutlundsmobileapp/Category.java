@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.startapp.sdk.adsbase.StartAppAd;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +38,11 @@ public class Category extends AppCompatActivity {
         setContentView(R.layout.activity_category);
         categorySlider();
         actionBar();
+        showAds();
+    }
+
+    private void showAds() {
+        StartAppAd.showAd(Category.this);
     }
 
     private void categorySlider() {

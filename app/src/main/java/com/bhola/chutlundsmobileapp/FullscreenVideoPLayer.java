@@ -72,6 +72,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
+import com.startapp.sdk.adsbase.StartAppAd;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -142,7 +143,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         getVideoData_API();
         setVideoPlayerHeight_PORTRAIT("portrait");
         actionBar();
-        loadAds();
+        showAds();
     }
 
 
@@ -695,9 +696,8 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
     }
 
-    private void loadAds() {
-        final Runnable[] runnable = new Runnable[1];
-        ExoclickAds.loadAds(this, handler, runnable);
+    private void showAds() {
+        StartAppAd.showAd(FullscreenVideoPLayer.this);
     }
 
     @Override
@@ -736,6 +736,7 @@ public class FullscreenVideoPLayer extends AppCompatActivity {
                 exoplayer.clearMediaItems();
             }
             backPressed=true;
+            StartAppAd.showAd(FullscreenVideoPLayer.this);
             super.onBackPressed();
             this.finish();
         }

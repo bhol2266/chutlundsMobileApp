@@ -67,6 +67,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
+import com.startapp.sdk.adsbase.Ad;
+import com.startapp.sdk.adsbase.StartAppAd;
+import com.startapp.sdk.adsbase.StartAppSDK;
+import com.startapp.sdk.adsbase.VideoListener;
+import com.startapp.sdk.adsbase.adlisteners.AdEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        startIoAds();
         navigationDrawer();
 
         trendingVideos();
@@ -121,9 +128,18 @@ public class MainActivity extends AppCompatActivity {
         checkForAppUpdate();
         getUserLocaitonUsingIP();
         checkLogin();
-        loadAds();
         gotoAdminpanel();
     }
+
+    private void startIoAds() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                StartAppAd.showAd(MainActivity.this);
+            }
+        },2000);
+    }
+
 
     private void gotoAdminpanel() {
         TextView NavbarChutlunds = findViewById(R.id.NavbarChutlunds);
@@ -167,10 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void loadAds() {
-        final Runnable[] runnable = new Runnable[1];
-        ExoclickAds.loadAds(this,handler,runnable);
-    }
+
 
     private void getUserLocaitonUsingIP() {
         String API_URL = " https://api.db-ip.com/v2/free/self";

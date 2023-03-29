@@ -98,6 +98,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.facebook.android:facebook-login:15.1.0'
     implementation 'com.facebook.android:facebook-android-sdk:15.1.0'
+    
+//start io Ads
+    implementation 'com.startapp:inapp-sdk:4.10.8'
 
 
 }
